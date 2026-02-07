@@ -1052,37 +1052,46 @@ h2::after {
    ========================================= */
 @media (max-width: 768px) {
 
-  /* Reduce excessive padding on main content containers */
+  /* Reduce excessive padding on main content containers to maximize text width */
   .chapter-main-column,
-  .chapter-content-container,
   .presentation .glass-card,
   .about-section .glass-card {
-    padding: 1.5rem !important;
-    /* Force override of 4rem */
+    padding: 1.2rem !important;
   }
 
-  /* Ensure text is not too small but line-height is comfortable */
-  p,
-  .chapter-body p {
-    font-size: 1.05rem;
-    line-height: 1.6;
-    text-align: justify;
-    hyphens: auto;
-    /* Helps with justification on small screens */
-    -webkit-hyphens: auto;
-  }
-
-  /* Adjust margins for containers */
   .chapter-content-container {
+    padding: 0 0.5rem;
+    /* Minimal wrapper padding */
     margin-top: 80px;
     margin-bottom: 2rem;
-    padding: 0 1rem;
-    /* Smaller horizontal padding on wrapper */
   }
 
-  /* Make sure hero title doesn't break weirdly */
-  .hero-title {
-    font-size: 2.5rem;
+  /* Typography Optimization for Reading */
+  p,
+  .chapter-body p {
+    font-size: 1.15rem;
+    /* Larger text is easier to read */
+    line-height: 1.8;
+    /* More breathing room between lines */
+    text-align: justify;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    margin-bottom: 1.5rem;
+    /* Clear separation between paragraphs */
+  }
+
+  /* Tame the giant titles on mobile */
+  h1,
+  .hero-title,
+  .chapter-title {
+    font-size: 2rem !important;
+    line-height: 1.2;
+    hyphens: manual;
+  }
+
+  h2,
+  .section-title {
+    font-size: 1.5rem !important;
   }
 
   .hero-logo-container {
@@ -1091,7 +1100,6 @@ h2::after {
 
   .hero-illustration,
   .hero-logo {
-    max-width: 150px;
-    /* Slightly smaller on mobile to fit */
+    max-width: 140px;
   }
 }
