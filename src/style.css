@@ -1066,9 +1066,11 @@ h2::after {
     margin-bottom: 2rem;
   }
 
-  /* Typography Optimization for Reading */
+  /* Typography Optimization for Reading - APPLIED GLOBALLY TO CONTENT PARAGRAPHS */
   p,
-  .chapter-body p {
+  .chapter-body p,
+  .presentation p,
+  .about-section p {
     font-size: 1.15rem;
     /* Larger text is easier to read */
     line-height: 1.8;
@@ -1094,12 +1096,30 @@ h2::after {
     font-size: 1.5rem !important;
   }
 
+  /* Hero Section Alignment Fixes */
+  .hero-section {
+    height: auto;
+    min-height: 100vh;
+    padding-bottom: 4rem;
+    /* Ensure space for scroll indicator */
+  }
+
   .hero-logo-container {
     gap: 1rem;
+    margin-bottom: 1rem;
   }
 
   .hero-illustration,
   .hero-logo {
-    max-width: 140px;
+    max-width: 130px;
+  }
+
+  /* Fix overlapping scroll indicator on mobile */
+  .hero-scroll-indicator {
+    position: relative;
+    /* No longer absolute prevents overlap */
+    bottom: auto;
+    margin-top: 3rem;
+    margin-bottom: 2rem;
   }
 }
