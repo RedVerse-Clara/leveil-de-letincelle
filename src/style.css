@@ -1,0 +1,1048 @@
+:root {
+  /* Colors */
+  --bg-dark: #0a0a0a;
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --bg-card-hover: rgba(255, 255, 255, 0.08);
+  --text-primary: #e0e0e0;
+  --text-secondary: #a0a0a0;
+  --accent: #00f3ff;
+  --accent-glow: rgba(0, 243, 255, 0.4);
+  --border-color: rgba(255, 255, 255, 0.1);
+
+  /* Typography */
+  --font-heading: 'Cinzel', serif;
+  --font-body: 'Inter', sans-serif;
+
+  /* Spacing */
+  --spacing-section: 6rem;
+  --header-height: 80px;
+
+  /* Animation */
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* =========================================
+   Typography
+   ========================================= */
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+h1 {
+  font-size: 3.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+h2 {
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  position: relative;
+  display: inline-block;
+}
+
+h2::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 60px;
+  height: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.electric-text {
+  color: var(--accent);
+  text-shadow: 0 0 10px var(--accent-glow);
+}
+
+/* =========================================
+   Layout & Utilities
+   ========================================= */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.section {
+  padding: var(--spacing-section) 0;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1.5rem;
+  border-radius: 4px;
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-family: var(--font-body);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.btn:hover {
+  background: var(--accent);
+  color: var(--bg-dark);
+  box-shadow: 0 0 20px var(--accent-glow);
+}
+
+.btn-large {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+}
+
+/* =========================================
+   Navigation
+   ========================================= */
+.navigation {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: var(--header-height);
+  z-index: 1000;
+  transition: background 0.3s ease;
+
+  /* Match Chapter Card Background */
+  background: var(--bg-card);
+  /* rgba(255, 255, 255, 0.05) */
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.navigation.scrolled {
+  /* Keep the same style, maybe slightly darker for contrast if scrolled, 
+      but user asked for "same color", so let's stick to consistency or slightly reinforced */
+  background: rgba(20, 20, 20, 0.85);
+  /* Slightly darker but still glassy/consistent tone */
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid var(--accent);
+  /* Subtle accent when scrolled */
+}
+
+.nav-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  height: 100%;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nav-logo {
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-decoration: none;
+  letter-spacing: 0.05em;
+}
+
+.nav-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.nav-link {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: color 0.3s ease;
+  position: relative;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--text-primary);
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 5px var(--accent);
+}
+
+.scroll-progress-container {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.scroll-progress-bar {
+  height: 100%;
+  background: var(--accent);
+  width: 0%;
+  box-shadow: 0 0 10px var(--accent);
+  transition: width 0.1s linear;
+}
+
+/* Mobile Menu */
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.hamburger {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--text-primary);
+  position: relative;
+  transition: var(--transition);
+}
+
+.hamburger::before,
+.hamburger::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: var(--text-primary);
+  transition: var(--transition);
+}
+
+.hamburger::before {
+  top: -8px;
+}
+
+.hamburger::after {
+  bottom: -8px;
+}
+
+.hamburger.open {
+  background: transparent;
+}
+
+.hamburger.open::before {
+  transform: rotate(45deg);
+  top: 0;
+}
+
+.hamburger.open::after {
+  transform: rotate(-45deg);
+  bottom: 0;
+}
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 100%;
+  height: 100vh;
+  background: var(--bg-dark);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  transition: right 0.4s ease;
+  z-index: 999;
+}
+
+.mobile-menu.open {
+  right: 0;
+}
+
+.mobile-nav-link {
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  text-decoration: none;
+  font-family: var(--font-heading);
+}
+
+/* =========================================
+   Hero Section
+   ========================================= */
+.hero-section {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  padding-top: var(--header-height);
+  background: radial-gradient(circle at center, rgba(30, 30, 30, 0.4) 0%, rgba(10, 10, 10, 0.8) 100%);
+}
+
+.hero-subtitle {
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  font-weight: 300;
+  text-transform: uppercase;
+  letter-spacing: 0.2rem;
+  margin-bottom: 3rem;
+  border: none;
+  display: block;
+}
+
+.hero-scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.7;
+  animation: bounce 2s infinite;
+}
+
+.scroll-arrow {
+  font-size: 1.2rem;
+}
+
+@keyframes bounce {
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
+    transform: translateY(0);
+  }
+
+  40% {
+    transform: translateY(-10px);
+  }
+
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* =========================================
+   Glass Card
+   ========================================= */
+.glass-card {
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  padding: 2.5rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* =========================================
+   Chapter Cards
+   ========================================= */
+.chapters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.chapter-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: var(--transition);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.chapter-card:hover {
+  transform: translateY(-5px);
+  background: var(--bg-card-hover);
+  border-color: var(--accent);
+  box-shadow: 0 10px 30px rgba(0, 243, 255, 0.1);
+}
+
+.card-image-container {
+  height: 250px;
+  overflow: hidden;
+  position: relative;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.chapter-card:hover .card-image {
+  transform: scale(1.05);
+}
+
+.card-content {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.card-title {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.card-excerpt {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  flex-grow: 1;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.read-chapter-btn {
+  width: 100%;
+  margin-top: auto;
+}
+
+/* =========================================
+   About Section
+   ========================================= */
+.about-section {
+  text-align: center;
+}
+
+/* =========================================
+   Footer
+   ========================================= */
+.main-footer {
+  padding: 2rem 0;
+  text-align: center;
+  border-top: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* =========================================
+   Bg Canvas
+   ========================================= */
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0a0a0a 100%),
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+.ash-particle {
+  position: absolute;
+  background: rgba(200, 200, 200, 0.3);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  animation: fall linear infinite;
+}
+
+@keyframes fall {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px) translateX(0);
+  }
+
+  10% {
+    opacity: 0.6;
+  }
+
+  90% {
+    opacity: 0.6;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(100vh) translateX(20px);
+  }
+}
+
+/* =========================================
+   Responsive
+   ========================================= */
+@media (max-width: 768px) {
+  :root {
+    --header-height: 60px;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+  }
+
+  h2 {
+    font-size: 2rem;
+  }
+
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+  }
+
+  .chapters-grid {
+    grid-template-columns: 1fr;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* =========================================
+   Hero Logo
+   ========================================= */
+.hero-logo-container {
+  margin-bottom: 2rem;
+  animation: float 6s ease-in-out infinite;
+}
+
+.hero-logo {
+  max-width: 200px;
+  height: auto;
+  border-radius: 50%;
+  box-shadow: 0 0 30px rgba(0, 243, 255, 0.3);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* =========================================
+   Presentation Styling
+   ========================================= */
+.presentation-subtitle {
+  font-family: var(--font-heading);
+  color: var(--accent);
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
+  display: inline-block;
+}
+
+.presentation-subtitle:first-of-type {
+  margin-top: 0;
+}
+
+.presentation-text {
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  opacity: 0.9;
+}
+
+.presentation-list-item {
+  list-style: none;
+  margin-left: 1.5rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+}
+
+.presentation-list-item::before {
+  content: '\26A1';
+  position: absolute;
+  left: -1.5rem;
+  color: var(--accent);
+  font-size: 0.8rem;
+}
+
+.presentation-cta {
+  margin-top: 3rem;
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 2rem;
+}
+
+.btn-support {
+  background: linear-gradient(45deg, #635bff, #00f3ff);
+  color: white;
+  border: none;
+  font-weight: 700;
+  padding: 1rem 2rem;
+  box-shadow: 0 4px 15px rgba(99, 91, 255, 0.4);
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.btn-support:hover {
+  background: linear-gradient(45deg, #5046e5, #00ddeb);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(99, 91, 255, 0.6);
+  color: white;
+}
+
+.btn-support .icon {
+  margin-right: 0.5rem;
+}
+
+/* =========================================
+   Chapter Reader Overlay
+   ========================================= */
+.chapter-reader-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Using the global circular gradient background for consistency, slightly darkened */
+  background: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #0a0a0a 100%);
+  z-index: 2000;
+  overflow-y: auto;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.chapter-reader-overlay.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.reader-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 60px;
+  /* Glassmorphism nav */
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  z-index: 2001;
+}
+
+.btn-close-reader {
+  background: none;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.btn-close-reader:hover {
+  color: var(--accent);
+  transform: scale(1.1);
+}
+
+.reader-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 200px;
+}
+
+.reader-progress-text {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  min-width: 45px;
+}
+
+.reader-progress-bar {
+  flex-grow: 1;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Tooltip for better understanding */
+.reader-progress-bar::after {
+  content: 'Progression de lecture';
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.reader-progress-container:hover .reader-progress-bar::after {
+  opacity: 1;
+}
+
+.reader-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--accent);
+  transition: width 0.1s;
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.chapter-content-container {
+  max-width: 1500px;
+  margin: 100px auto 4rem;
+  padding: 0 2rem;
+  color: #e0e0e0;
+}
+
+.chapter-header {
+  text-align: center;
+  margin-bottom: 4rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 2rem;
+}
+
+.chapter-title {
+  font-size: 3rem;
+  color: var(--accent);
+  margin-bottom: 1rem;
+}
+
+.chapter-meta {
+  color: var(--text-secondary);
+  font-style: italic;
+  font-family: var(--font-heading);
+}
+
+.chapter-body {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  font-family: 'Merriweather', serif;
+  /* Better for long reading */
+  text-align: justify;
+}
+
+.chapter-body p {
+  margin-bottom: 1.5rem;
+}
+
+.chapter-footer {
+  margin-top: 4rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border-color);
+}
+
+.chapter-navigation {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn-nav-chapter {
+  font-size: 0.9rem;
+  padding: 0.6rem 1.2rem;
+}
+
+/* Add Merriweather font for reading */
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+
+
+/* =========================================
+   Comments Section
+   ========================================= */
+.chapter-comments {
+  max-width: 800px;
+  margin: 4rem auto 2rem;
+  padding-top: 2rem;
+  border-top: 1px dashed var(--border-color);
+}
+
+.comments-title {
+  font-family: var(--font-heading);
+  color: var(--accent);
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+#comments-container {
+  min-height: 200px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+
+/* =========================================
+   Cusdis Comments Styling
+   ========================================= */
+#cusdis_thread {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+/* Force dark mode compatibility if constraints allow */
+#cusdis_thread iframe {
+  width: 100% !important;
+  color-scheme: dark;
+}
+
+
+/* =========================================
+   Chapter Reader Grid Layout (Sidebar)
+   ========================================= */
+.chapter-content-container {
+  max-width: 1400px;
+  /* Wider to accommodate sidebar */
+  margin: 80px auto 4rem;
+  padding: 0 2rem;
+  color: #e0e0e0;
+}
+
+.chapter-grid {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  /* Main content | Sidebar width */
+  gap: 4rem;
+  position: relative;
+}
+
+/* Main Column */
+.chapter-main-column {
+  /* BACKGROUND: exact match to Presentation section (glass-card) */
+  background: var(--bg-card);
+  /* rgba(255, 255, 255, 0.05) */
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 4rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  min-width: 0;
+}
+
+/* Sidebar Styling */
+.chapter-sidebar {
+  position: relative;
+  height: 100%;
+}
+
+/* The sticky container inside sidebar */
+.sidebar-sticky-content {
+  position: sticky;
+  top: 90px;
+  /* Fixed height to fit in viewport - header height - margin */
+  height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Comments Box in Sidebar */
+.comments-sidebar-box {
+  background: var(--bg-card);
+  /* Match main column */
+  backdrop-filter: blur(10px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+
+  /* Flex to fill remaining height of the sticky container */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.comments-title-sidebar {
+  font-family: var(--font-heading);
+  color: var(--accent);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 0.5rem;
+  flex-shrink: 0;
+}
+
+#comments-container {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+/* Styles for scrollbar inside comments */
+#comments-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+#comments-container::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+#comments-container::-webkit-scrollbar-thumb {
+  background-color: var(--accent);
+  border-radius: 3px;
+}
+
+/* Cusdis Styling */
+#cusdis_thread {
+  width: 100%;
+}
+
+#cusdis_thread iframe {
+  width: 100% !important;
+  /* Let the iframe be as tall as it wants, we scroll the container */
+  height: auto !important;
+  min-height: 500px;
+  border: none;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 1024px) {
+  .chapter-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar-sticky-content {
+    position: static;
+    height: auto;
+  }
+
+  .comments-sidebar-box {
+    height: 600px;
+    min-height: 600px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .mobile-only {
+    display: none;
+  }
+}
+
+/* Force styles for the main chapter column buttons */
+.chapter-navigation {
+  margin-top: 2rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* =========================================
+   Comment Success Message
+   ========================================= */
+.comment-success-message {
+  background: rgba(0, 243, 255, 0.1);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  padding: 1rem;
+  border-radius: 4px;
+  margin-top: 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================
+   Hero Illustration
+   ========================================= */
+.hero-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+  /* On mobile, stack */
+}
+
+.hero-illustration {
+  max-width: 200px;
+  /* Match logo size roughly */
+  height: auto;
+  border-radius: 8px;
+  /* Soften edges if needed, or keeping it raw if transparent png */
+  /* If PNG has transparency, no border/shadow might be better, or a glow */
+  filter: drop-shadow(0 0 15px rgba(0, 243, 255, 0.3));
+  transition: transform 0.3s ease;
+}
+
+.hero-illustration:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .hero-logo-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

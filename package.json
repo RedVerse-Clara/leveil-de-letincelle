@@ -1,0 +1,15 @@
+{
+  "name": "leveil-de-letincelle",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "node generate-sitemap.js && vite build",
+    "sitemap": "node generate-sitemap.js",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^7.2.4"
+  }
+}
