@@ -1052,27 +1052,34 @@ h2::after {
    ========================================= */
 @media (max-width: 768px) {
 
-  /* Reduce excessive padding on main content containers to maximize text width */
-  .chapter-main-column,
-  .presentation .glass-card,
-  .about-section .glass-card {
-    padding: 1.2rem !important;
-  }
-
-  .chapter-content-container,
+  /* 1. Reset container padding for presentation and about to allow full width */
   .presentation .container,
   .about-section .container {
-    padding: 0 0.5rem;
-    /* Minimal wrapper padding applied to ALL sections */
+    padding: 0 !important;
+    width: 100%;
     margin-top: 2rem;
-    /* Consistent top spacing */
     margin-bottom: 2rem;
   }
 
-  /* Specific fix for Chapter Reader top margin which needs to be larger due to fixed header inside reader if applicable, 
-     but actually main page header is also fixed. The reader overlay likely needs more top because of its specific nav. */
+  /* 2. Configure the glass card to have the correct internal padding and outer margin */
+  .presentation .glass-card,
+  .about-section .glass-card {
+    padding: 1.5rem !important;
+    /* Internal spacing for text */
+    margin: 0 0.5rem;
+    /* Small external margin to not touch the screen edges */
+    border-radius: 8px;
+    /* Ensure radius is visible */
+  }
+
+  /* 3. Match Chapter Main Column to be consistent */
+  .chapter-main-column {
+    padding: 1.5rem !important;
+  }
+
   .chapter-content-container {
     margin-top: 80px;
+    padding: 0 0.5rem;
   }
 
   /* Typography Optimization for Reading - APPLIED GLOBALLY TO CONTENT PARAGRAPHS */
