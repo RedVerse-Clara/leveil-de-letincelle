@@ -1059,11 +1059,20 @@ h2::after {
     padding: 1.2rem !important;
   }
 
-  .chapter-content-container {
+  .chapter-content-container,
+  .presentation .container,
+  .about-section .container {
     padding: 0 0.5rem;
-    /* Minimal wrapper padding */
-    margin-top: 80px;
+    /* Minimal wrapper padding applied to ALL sections */
+    margin-top: 2rem;
+    /* Consistent top spacing */
     margin-bottom: 2rem;
+  }
+
+  /* Specific fix for Chapter Reader top margin which needs to be larger due to fixed header inside reader if applicable, 
+     but actually main page header is also fixed. The reader overlay likely needs more top because of its specific nav. */
+  .chapter-content-container {
+    margin-top: 80px;
   }
 
   /* Typography Optimization for Reading - APPLIED GLOBALLY TO CONTENT PARAGRAPHS */
@@ -1072,14 +1081,11 @@ h2::after {
   .presentation p,
   .about-section p {
     font-size: 1.15rem;
-    /* Larger text is easier to read */
     line-height: 1.8;
-    /* More breathing room between lines */
     text-align: justify;
     hyphens: auto;
     -webkit-hyphens: auto;
     margin-bottom: 1.5rem;
-    /* Clear separation between paragraphs */
   }
 
   /* Tame the giant titles on mobile */
@@ -1101,7 +1107,6 @@ h2::after {
     height: auto;
     min-height: 100vh;
     padding-bottom: 4rem;
-    /* Ensure space for scroll indicator */
   }
 
   .hero-logo-container {
@@ -1117,7 +1122,6 @@ h2::after {
   /* Fix overlapping scroll indicator on mobile */
   .hero-scroll-indicator {
     position: relative;
-    /* No longer absolute prevents overlap */
     bottom: auto;
     margin-top: 3rem;
     margin-bottom: 2rem;
