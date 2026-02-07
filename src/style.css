@@ -1053,7 +1053,9 @@ h2::after {
 @media (max-width: 768px) {
 
   /* 1. Reset container padding for presentation and about to allow full width */
-  .presentation .container,
+  #presentation .container,
+  .presentation-section .container,
+  #about .container,
   .about-section .container {
     padding: 0 !important;
     width: 100%;
@@ -1062,14 +1064,17 @@ h2::after {
   }
 
   /* 2. Configure the glass card to have the correct internal padding and outer margin */
-  .presentation .glass-card,
+  #presentation .glass-card,
+  #about .glass-card,
+  .presentation-section .glass-card,
   .about-section .glass-card {
     padding: 1.5rem !important;
     /* Internal spacing for text */
-    margin: 0 0.5rem;
+    margin: 0 0.5rem !important;
     /* Small external margin to not touch the screen edges */
     border-radius: 8px;
     /* Ensure radius is visible */
+    width: auto;
   }
 
   /* 3. Match Chapter Main Column to be consistent */
