@@ -1046,43 +1046,52 @@ h2::after {
     gap: 1rem;
   }
 }
+
 /* =========================================
    Mobile Optimization Overrides
    ========================================= */
 @media (max-width: 768px) {
+
   /* Reduce excessive padding on main content containers */
   .chapter-main-column,
   .chapter-content-container,
   .presentation .glass-card,
   .about-section .glass-card {
-    padding: 1.5rem !important; /* Force override of 4rem */
+    padding: 1.5rem !important;
+    /* Force override of 4rem */
   }
 
   /* Ensure text is not too small but line-height is comfortable */
-  p, .chapter-body p {
+  p,
+  .chapter-body p {
     font-size: 1.05rem;
     line-height: 1.6;
-    text-align: left; /* Justified text on mobile can cause rivers */
+    text-align: justify;
+    hyphens: auto;
+    /* Helps with justification on small screens */
+    -webkit-hyphens: auto;
   }
 
   /* Adjust margins for containers */
   .chapter-content-container {
     margin-top: 80px;
     margin-bottom: 2rem;
-    padding: 0 1rem; /* Smaller horizontal padding on wrapper */
+    padding: 0 1rem;
+    /* Smaller horizontal padding on wrapper */
   }
-  
+
   /* Make sure hero title doesn't break weirdly */
   .hero-title {
     font-size: 2.5rem;
   }
-  
+
   .hero-logo-container {
     gap: 1rem;
   }
-  
-  .hero-illustration, .hero-logo {
-    max-width: 150px; /* Slightly smaller on mobile to fit */
+
+  .hero-illustration,
+  .hero-logo {
+    max-width: 150px;
+    /* Slightly smaller on mobile to fit */
   }
 }
-
