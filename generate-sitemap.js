@@ -16,13 +16,18 @@ try {
   const { chapters } = JSON.parse(data);
 
   const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <!-- Homepage -->
   <url>
     <loc>${BASE_URL}/</loc>
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>${BASE_URL}/images/logo.jpg</image:loc>
+      <image:title>L'Éveil de l'Étincelle - Roman Fantasy</image:title>
+    </image:image>
   </url>
   <!-- Chapters -->
   ${chapters.map(chapter => `
@@ -31,6 +36,10 @@ try {
     <lastmod>${new Date().toISOString().split('T')[0]}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>${BASE_URL}/images/logo.jpg</image:loc>
+      <image:title>${chapter.title} - L'Éveil de l'Étincelle</image:title>
+    </image:image>
   </url>
   `).join('')}
 </urlset>`;
