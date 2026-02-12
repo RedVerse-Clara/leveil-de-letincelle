@@ -13,7 +13,7 @@ import { updateSEO } from './utils/seo.js'; // Import SEO manager
 // We construct the element dynamically when a chapter is opened
 const CUSDIS_APP_ID = "f4c40187-515a-4943-a0c6-f498019a4115";
 
-function loadComments(chapterId, title) {
+function loadComments(chapterId, title, stripeLink) {
   const container = document.getElementById('comments-container');
   if (!container) return;
 
@@ -42,11 +42,30 @@ function loadComments(chapterId, title) {
     window.CUSDIS.initial();
   }
 
-  // Add static moderation notice below the thread
-  const notice = document.createElement('p');
-  notice.style.cssText = "text-align: center; color: var(--text-secondary); font-size: 0.85rem; margin-top: 1rem; opacity: 0.8;";
-  notice.innerText = "Note : Les commentaires sont soumis à validation avant d'apparaître.";
-  container.appendChild(notice);
+  // Add moderation notice in separate container (always visible, outside scrollable area)
+  const noticeContainer = document.getElementById('moderation-notice-container');
+  if (noticeContainer) {
+    const notice = document.createElement('p');
+    notice.style.cssText = "color: var(--text-secondary); font-size: 0.85rem; opacity: 0.8; margin: 0;";
+    notice.innerText = "Note : Les commentaires sont soumis à validation avant d'apparaître.";
+    noticeContainer.innerHTML = '';
+    noticeContainer.appendChild(notice);
+  }
+
+  // Add support button in separate container (always visible, outside scrollable area)
+  const supportContainer = document.getElementById('support-button-container');
+  if (supportContainer && stripeLink) {
+    supportContainer.innerHTML = ''; // Clear any previous button
+
+    const supportButton = document.createElement('a');
+    supportButton.href = stripeLink;
+    supportButton.target = "_blank";
+    supportButton.rel = "noopener noreferrer";
+    supportButton.className = "btn-support";
+    supportButton.innerHTML = '<span class="icon">❤️</span> Soutenir le projet';
+
+    supportContainer.appendChild(supportButton);
+  }
 }
 
 // Global Listener to try and catch post success if emitted
@@ -97,7 +116,7 @@ function renderApp() {
     
     <div id="content-wrapper">
       <main>
-        ${renderHero()}
+        ${renderHero(chaptersData)}
         
         ${renderPresentation(chaptersData.presentation)}
         
@@ -172,7 +191,7 @@ function openChapter(chapterId) {
   readerContainer.innerHTML = renderChapterReader(chapter, chaptersData.chapters);
 
   // Initialize Comments for this chapter
-  loadComments(chapter.id, chapter.title);
+  loadComments(chapter.id, chapter.title, chaptersData.presentation.stripeLink);
 
   // Update URL hash
   history.pushState({ chapterId }, '', `#${chapterId}`);

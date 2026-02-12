@@ -1,5 +1,9 @@
 
-export function renderHero() {
+export function renderHero(chaptersData) {
+  const totalChapters = 40;
+  const writtenChapters = chaptersData?.chapters?.length || 0;
+  const progressPercent = Math.round((writtenChapters / totalChapters) * 100);
+
   return `
     <section id="home" class="hero-section">
       <div class="hero-content">
@@ -9,6 +13,17 @@ export function renderHero() {
         </div>
         <h1 class="hero-title">L'Éveil de l'Étincelle</h1>
         <h2 class="hero-subtitle electric-text">Tome 1 : Les Cendres</h2>
+        
+        <div class="writing-progress-container">
+          <div class="writing-progress-info">
+            <span class="progress-label">Progression d'écriture</span>
+            <span class="progress-stats">${writtenChapters} / ${totalChapters} chapitres (${progressPercent}%)</span>
+          </div>
+          <div class="writing-progress-bar">
+            <div class="writing-progress-fill" style="width: ${progressPercent}%"></div>
+          </div>
+        </div>
+
         <div class="hero-cta-container">
           <a href="#chapters" class="btn btn-large btn-glow">
             Lire les derniers chapitres

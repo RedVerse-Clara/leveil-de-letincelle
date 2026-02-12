@@ -57,6 +57,14 @@ export function renderChapterReader(chapter, allChapters) {
                         <div id="comments-container">
                             <p class="loading-text">Chargement des commentaires...</p>
                         </div>
+                        
+                        <!-- Moderation notice always visible -->
+                        <div id="moderation-notice-container" style="text-align: center; margin-top: 1rem;">
+                        </div>
+                        
+                        <!-- Support button always visible -->
+                        <div id="support-button-container" style="text-align: center; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                        </div>
                     </div>
                 </div>
             </aside>
