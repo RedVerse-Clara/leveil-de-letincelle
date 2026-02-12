@@ -615,6 +615,102 @@ h2::after {
     margin-left: auto;
     margin-right: auto;
   }
+
+  /* =========================================
+     Mobile Reading Experience Optimizations
+     ========================================= */
+
+  /* Optimized typography for comfortable mobile reading */
+  .chapter-body {
+    font-size: 1.125rem;
+    /* 18px - optimal for mobile reading */
+    line-height: 1.75;
+    /* Improved readability */
+    text-align: left;
+    /* Avoid irregular spacing from justify */
+    padding: 0 1.25rem;
+    /* More breathing room on sides */
+    color: #e8e8e8;
+    /* Slightly lighter for better contrast */
+  }
+
+  .chapter-body p {
+    margin-bottom: 1.75rem;
+    /* More space between paragraphs */
+  }
+
+  /* Optimized chapter header for mobile */
+  .chapter-title {
+    font-size: 2rem;
+    line-height: 1.2;
+    margin-bottom: 1rem;
+    padding: 0 1.25rem;
+  }
+
+  .chapter-meta {
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+    padding: 0 1.25rem;
+  }
+
+  .chapter-header {
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .chapter-content-container {
+    padding: 0;
+    margin-top: 80px;
+  }
+
+  /* Enlarged touch targets for better UX (44x44px minimum) */
+  .btn-nav-chapter {
+    font-size: 1rem;
+    padding: 0.875rem 1.5rem;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .btn-close-reader {
+    font-size: 1.75rem;
+    padding: 0.75rem;
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Compact and discrete progress bar on mobile */
+  .reader-progress-container {
+    width: 150px;
+  }
+
+  .reader-progress-text {
+    font-size: 0.75rem;
+  }
+
+  .reader-progress-bar {
+    height: 3px;
+  }
+
+  /* Optimized comments section for mobile */
+  .chapter-sidebar {
+    margin-top: 3rem;
+    padding: 0 1.25rem;
+  }
+
+  .comments-title-sidebar {
+    font-size: 1.25rem;
+  }
+
+  #comments-container {
+    max-height: 400px;
+    overflow-y: auto;
+  }
+
+  /* Better footer spacing on mobile */
+  .chapter-footer {
+    margin-top: 3rem;
+    padding: 1.5rem 1.25rem;
+  }
 }
 
 /* =========================================
@@ -958,6 +1054,8 @@ h2::after {
   font-family: 'Merriweather', serif;
   /* Better for long reading */
   text-align: justify;
+  color: #e8e8e8;
+  /* Improved contrast for better readability */
 }
 
 .chapter-body p {

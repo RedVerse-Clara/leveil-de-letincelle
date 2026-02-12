@@ -2,23 +2,23 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Homepage -->
   <url>
-    <loc>https://leveil-de-letincelle.fr/</loc>
-    <lastmod>2026-02-07</lastmod>
+    <loc>https://www.leveildeletincelle.fr/</loc>
+    <lastmod>2026-02-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <!-- Chapters -->
   
   <url>
-    <loc>https://leveil-de-letincelle.fr/#chapter-1</loc>
-    <lastmod>2026-02-07</lastmod>
+    <loc>https://www.leveildeletincelle.fr/#chapter-1</loc>
+    <lastmod>2026-02-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   
   <url>
-    <loc>https://leveil-de-letincelle.fr/#chapter-2</loc>
-    <lastmod>2026-02-07</lastmod>
+    <loc>https://www.leveildeletincelle.fr/#chapter-2</loc>
+    <lastmod>2026-02-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

@@ -4,7 +4,7 @@
  * Handles dynamic meta tags, Open Graph, and JSON-LD structured data.
  */
 
-const BASE_URL = 'https://leveil-de-letincelle.fr'; // Replace with actual domain when live
+const BASE_URL = 'https://www.leveildeletincelle.fr';
 const AUTHOR_NAME = 'Marc';
 const BOOK_TITLE = "L'Éveil de l'Étincelle";
 

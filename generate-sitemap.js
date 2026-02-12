@@ -9,13 +9,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const chaptersPath = path.join(__dirname, 'src/content/chapters.json');
 const publicPath = path.join(__dirname, 'public/sitemap.xml');
 
-const BASE_URL = 'https://leveil-de-letincelle.fr';
+const BASE_URL = 'https://www.leveildeletincelle.fr';
 
 try {
-    const data = fs.readFileSync(chaptersPath, 'utf8');
-    const { chapters } = JSON.parse(data);
+  const data = fs.readFileSync(chaptersPath, 'utf8');
+  const { chapters } = JSON.parse(data);
 
-    const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
+  const sitemapContent = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Homepage -->
   <url>
@@ -35,11 +35,11 @@ try {
   `).join('')}
 </urlset>`;
 
-    fs.writeFileSync(publicPath, sitemapContent);
-    console.log('✅ Sitemap generated successfully at public/sitemap.xml');
-    console.log(`   - Homepage included`);
-    console.log(`   - ${chapters.length} chapters indexed`);
+  fs.writeFileSync(publicPath, sitemapContent);
+  console.log('✅ Sitemap generated successfully at public/sitemap.xml');
+  console.log(`   - Homepage included`);
+  console.log(`   - ${chapters.length} chapters indexed`);
 
 } catch (error) {
-    console.error('❌ Error generating sitemap:', error);
+  console.error('❌ Error generating sitemap:', error);
 }
