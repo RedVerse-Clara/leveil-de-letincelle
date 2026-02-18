@@ -1,0 +1,16 @@
+User-agent: *
+
+# Description
+Site officiel du roman de fantasy "L'Éveil de l'Étincelle".
+Auteur : Marc ASSI.
+
+# Context
+Type: Fiction Créative / Fantasy Épique
+Status: En cours de parution
+Rythme: Hebdomadaire
+Interaction: Commentaires autorisés, co-création bienvenue.
+
+# Knowledge Base
+Url: https://www.leveildeletincelle.fr/
+Sitemap: https://www.leveildeletincelle.fr/sitemap.xml
+Language: fr-FR

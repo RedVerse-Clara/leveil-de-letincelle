@@ -18,7 +18,7 @@ export function updateSEO(type, data = {}) {
         document.title = `${BOOK_TITLE} | Roman Fantasy par ${AUTHOR_NAME}`;
 
         setMeta('description', description);
-        setMeta('keywords', 'roman fantasy, lecture en ligne, marc auteur, livre gratuit, écriture, webroman, imaginaire, épopée');
+        setMeta('keywords', 'roman fantasy, lecture en ligne, marc auteur, livre gratuit, écriture, webroman, imaginaire, épopée, Marc ASSI');
         setCanonical(BASE_URL);
 
         // Open Graph / Social
@@ -59,11 +59,24 @@ export function updateSEO(type, data = {}) {
                     }
                 },
                 {
-                    "@type": "Person",
                     "@id": `${BASE_URL}/#author`,
-                    "name": AUTHOR_NAME,
-                    "jobTitle": "Auteur",
-                    "url": BASE_URL
+                    "@type": "Person",
+                    "name": AUTHOR_NAME + " ASSI",
+                    "jobTitle": "Auteur & Créateur",
+                    "url": BASE_URL,
+                    "sameAs": [
+                        "https://www.linkedin.com/in/marcassiofficial", // Placeholder or from metadata
+                        "https://github.com/RedVerse-Clara"
+                    ]
+                },
+                {
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [{
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "Accueil",
+                        "item": BASE_URL
+                    }]
                 }
             ]
         });
@@ -74,7 +87,7 @@ export function updateSEO(type, data = {}) {
             genre: "epic_fantasy",
             status: "ongoing",
             language: "fr",
-            author: AUTHOR_NAME
+            author: AUTHOR_NAME + " ASSI"
         }));
 
     } else if (type === 'chapter') {
@@ -94,23 +107,44 @@ export function updateSEO(type, data = {}) {
             type: 'article'
         });
 
-        // JSON-LD for the Chapter
+        // JSON-LD for the Chapter + Breadcrumb
         injectJSONLD({
             "@context": "https://schema.org",
-            "@type": "Chapter",
-            "headline": title,
-            "isPartOf": {
-                "@type": "Book",
-                "name": BOOK_TITLE,
-                "url": BASE_URL
-            },
-            "position": id.replace('chapter-', ''),
-            "author": {
-                "@type": "Person",
-                "name": AUTHOR_NAME
-            },
-            "description": cleanExcerpt,
-            "url": chapterUrl
+            "@graph": [
+                {
+                    "@type": "Chapter",
+                    "headline": title,
+                    "isPartOf": {
+                        "@type": "Book",
+                        "name": BOOK_TITLE,
+                        "url": BASE_URL
+                    },
+                    "position": id.replace('chapter-', ''),
+                    "author": {
+                        "@type": "Person",
+                        "name": AUTHOR_NAME + " ASSI"
+                    },
+                    "description": cleanExcerpt,
+                    "url": chapterUrl
+                },
+                {
+                    "@type": "BreadcrumbList",
+                    "itemListElement": [
+                        {
+                            "@type": "ListItem",
+                            "position": 1,
+                            "name": "Accueil",
+                            "item": BASE_URL
+                        },
+                        {
+                            "@type": "ListItem",
+                            "position": 2,
+                            "name": title,
+                            "item": chapterUrl
+                        }
+                    ]
+                }
+            ]
         });
     }
 }

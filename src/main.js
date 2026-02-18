@@ -133,7 +133,8 @@ function renderApp() {
           <div class="container">
             <h2 class="section-title">À Propos</h2>
             <div class="glass-card">
-              <p>L'Éveil de l'Étincelle est une épopée fantaisie écrite avec passion. Suivez-nous pour découvrir la suite des aventures d'Hilyésin.</p>
+              <p>L'Éveil de l'Étincelle est une épopée fantaisie écrite avec passion. Suivez-moi pour découvrir la suite des aventures d'Hilyésin.</p>
+              <p style="margin-top: 1rem; font-weight: 600; font-family: 'Cinzel', serif;">Marc ASSI</p>
               <p style="margin-top: 1rem; opacity: 0.7;">© 2026 L'Éveil de l'Étincelle. Tous droits réservés.</p>
             </div>
           </div>
