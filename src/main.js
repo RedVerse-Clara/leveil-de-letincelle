@@ -239,7 +239,6 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
       p.insertAdjacentHTML('beforeend', chapter.content);
       totalPages = 1; currentPage = 1;
       updateProgress(); scrollPage(1, true);
-      if (isMobile) _showSwipeHint();
       return;
     }
 
