@@ -194,37 +194,24 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
 
   let totalPages = 1;
   let currentPage = 1;
-  let currentPageHeight = 0; // hauteur de page utilisée à la création — référence unique pour scrollPage et snap JS
   let pageElements = [];
   let touchStartX = 0;
-  let touchEndX = 0;
-  let mobileScrollHandler = null; // listener sur carousel en mode colonnes
+  let touchStartY = 0;
 
   function createHorizontalPages(restorePage = 1) {
     track.innerHTML = '';
     pageElements = [];
 
-    // Nettoyer l'ancien listener mobile si présent (évite les doublons au resize)
-    if (mobileScrollHandler) {
-      carousel.removeEventListener('scroll', mobileScrollHandler);
-      mobileScrollHandler = null;
-    }
-
     const isMobile = window.innerWidth <= 768;
 
     // Dimensions d'une page.
-    // Sur mobile, le carousel utilise scroll-snap vertical : chaque page fait exactement
-    // la hauteur du carousel. Le padding-bottom CSS (4rem) crée la marge de sécurité
-    // vis-à-vis de la barre gestuelle Android sans nécessiter de calcul JS.
+    // Sur mobile, le carousel est position:fixed top:60px bottom:0.
+    // Les pages sont position:absolute height:100% — le clientHeight sert uniquement
+    // à l'algorithme de découpe (overflow check), pas au scroll.
     const pageWidth = isMobile ? carousel.offsetWidth : track.offsetWidth;
     const pageHeight = isMobile
       ? Math.max(200, carousel.clientHeight)
       : track.offsetHeight;
-    currentPageHeight = pageHeight; // synchronise la référence utilisée par scrollPage et le snap JS
-
-    if (isMobile) {
-      track.style.cssText = `display:flex;flex-direction:column;height:auto;overflow:visible;`;
-    }
 
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = chapter.content;
@@ -252,7 +239,6 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
       p.insertAdjacentHTML('beforeend', chapter.content);
       totalPages = 1; currentPage = 1;
       updateProgress(); scrollPage(1, true);
-      if (isMobile) _attachMobileScroll(pageHeight);
       return;
     }
 
@@ -323,38 +309,6 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     currentPage = 1;
     updateProgress();
     scrollPage(Math.min(restorePage, totalPages || 1), true);
-
-    if (isMobile) _attachMobileScroll(pageHeight);
-  }
-
-  function _attachMobileScroll(pageHeight) {
-    // CSS scroll-snap-type: y mandatory est déclaré sur le carousel, mais les pages
-    // sont des petits-enfants (pas enfants directs) — certains Chrome Android ignorent
-    // le snap dans ce cas. On ajoute un snap JS 80 ms après la fin du scroll comme
-    // filet de sécurité : il ne fait rien si le snap CSS a déjà corrigé la position.
-    let snapTimer;
-    mobileScrollHandler = () => {
-      currentPage = Math.round(carousel.scrollTop / pageHeight) + 1;
-      updateProgress();
-      clearTimeout(snapTimer);
-      snapTimer = setTimeout(() => {
-        const target = Math.round(carousel.scrollTop / pageHeight) * pageHeight;
-        if (Math.abs(carousel.scrollTop - target) > 2) {
-          carousel.scrollTo({ top: target, behavior: 'smooth' });
-        }
-      }, 80);
-    };
-    carousel.addEventListener('scroll', mobileScrollHandler, { passive: true });
-
-    // Hint scroll : montrer une seule fois par session
-    if (!sessionStorage.getItem('scrollHintShown')) {
-      sessionStorage.setItem('scrollHintShown', '1');
-      const hint = document.createElement('div');
-      hint.className = 'swipe-hint';
-      hint.textContent = '↑ Glisser pour tourner les pages ↓';
-      overlay.appendChild(hint);
-      setTimeout(() => hint.remove(), 3100);
-    }
   }
 
   // Mettre à jour la progression
@@ -376,8 +330,10 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     if (pageNum < 1 || pageNum > totalPages) return;
     currentPage = pageNum;
     if (window.innerWidth <= 768) {
-      // Mobile : scroll vertical, chaque page = currentPageHeight (valeur capturée à la création des pages)
-      carousel.scrollTo({ top: (pageNum - 1) * currentPageHeight, behavior: instant ? 'instant' : 'smooth' });
+      // Mobile : affichage par classe CSS — zéro scroll, zéro snap, zéro calcul de hauteur
+      pageElements.forEach((p, i) => {
+        p.classList.toggle('chapter-page--active', i === pageNum - 1);
+      });
     } else {
       // Desktop : scroll horizontal
       track.scrollTo({ left: (pageNum - 1) * track.offsetWidth, behavior: instant ? 'instant' : 'smooth' });
@@ -393,24 +349,21 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     }
   }
 
-  // Touch Events for mobile swipe
+  // Touch Events — swipe vertical sur mobile, horizontal sur desktop
   const handleTouchStart = (e) => {
     touchStartX = e.changedTouches[0].screenX;
+    touchStartY = e.changedTouches[0].screenY;
   };
 
   const handleTouchEnd = (e) => {
-    touchEndX = e.changedTouches[0].screenX;
-    handleSwipe();
-  };
-
-  const handleSwipe = () => {
-    if (touchEndX < touchStartX - 50) {
-      // Swipe gauche
-      goToPage(1);
-    }
-    if (touchEndX > touchStartX + 50) {
-      // Swipe droite
-      goToPage(-1);
+    const dx = e.changedTouches[0].screenX - touchStartX;
+    const dy = e.changedTouches[0].screenY - touchStartY;
+    if (window.innerWidth <= 768) {
+      if (dy < -50) goToPage(1);   // Swipe haut → page suivante
+      if (dy > 50)  goToPage(-1);  // Swipe bas  → page précédente
+    } else {
+      if (dx < -50) goToPage(1);   // Swipe gauche → page suivante
+      if (dx > 50)  goToPage(-1);  // Swipe droite → page précédente
     }
   };
 
@@ -426,9 +379,9 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
   };
   window.addEventListener('keydown', handleKeydown);
 
-  // Touch Events
-  track.addEventListener('touchstart', handleTouchStart);
-  track.addEventListener('touchend', handleTouchEnd);
+  // Touch Events — carousel couvre mobile (pages abs) et desktop (track scroll)
+  carousel.addEventListener('touchstart', handleTouchStart, { passive: true });
+  carousel.addEventListener('touchend', handleTouchEnd);
 
   // Close Reader
   closeBtn.addEventListener('click', () => {
@@ -515,10 +468,6 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     window.removeEventListener('resize', handleResize);
     window.removeEventListener('keydown', handleKeydown);
     if (window.visualViewport) window.visualViewport.removeEventListener('resize', handleResize);
-    if (mobileScrollHandler) {
-      carousel.removeEventListener('scroll', mobileScrollHandler);
-      mobileScrollHandler = null;
-    }
   }, { once: true });
 }
 

@@ -1453,38 +1453,43 @@ h2::after {
 }
 
 @media (max-width: 768px) {
-  /* Carousel = conteneur de scroll vertical par pages sur mobile.
-     bottom: 0 intentionnel : le padding-bottom des pages crée la marge de sécurité
-     vis-à-vis de la barre gestuelle Android, sans dépendre de env() qui retourne 0. */
+  /* Carousel = conteneur de positionnement (plus de scroll sur mobile).
+     Les pages sont empilées en position:absolute, une seule visible à la fois. */
   .chapter-carousel {
     right: 0;
     bottom: 0;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    scroll-snap-type: y mandatory;
-    scrollbar-width: none;
+    overflow: hidden;
   }
 
-  .chapter-carousel::-webkit-scrollbar { display: none; }
-
-  /* Track = flex colonne (pages empilées verticalement, styles injectés par JS) */
+  /* Track = conteneur de positionnement pour les pages en mode transform */
   .chapter-track {
-    display: flex;
-    flex-direction: column;
-    overflow: visible;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
   }
 
-  /* Padding et typographie des pages en lecture mobile.
-     padding-bottom 4rem : marge de sécurité au-dessus de la barre gestuelle Android.
-     overflow: hidden forcé : empêche le débordement visible entre pages.
-     scroll-snap : alignement CSS natif (complété par un snap JS de secours). */
+  /* Pages mobiles : toutes au même endroit, une seule visible (chapter-page--active).
+     padding-bottom 4rem : marge de sécurité au-dessus de la barre gestuelle Android. */
   .chapter-page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     padding: 1.5rem 1.5rem 4rem !important;
     font-size: 1.05rem;
     line-height: 2.05;
-    overflow: hidden;
-    scroll-snap-align: start;
-    scroll-snap-stop: always;
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+
+  .chapter-page--active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
   }
 
   /* Titre de chapitre sur la première page mobile */
@@ -1493,46 +1498,11 @@ h2::after {
     margin-bottom: 1.2rem;
   }
 
-  /* Paragraphes mobile : justifiés + césure intelligente + longueur de ligne maîtrisée */
+  /* Paragraphes mobile */
   .chapter-page p {
     max-width: 65ch;
     margin-left: auto;
     margin-right: auto;
-  }
-
-  /* Éléments texte dans le track colonnes (styles conservés pour compatibilité) */
-  .chapter-track > p,
-  .chapter-track > h2,
-  .chapter-track > h3,
-  .chapter-track > .chapter-end-cta {
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-  }
-
-  /* Titre du chapitre en mode colonnes */
-  .chapter-page-title--col {
-    font-size: 1.3rem;
-    padding: 1.5rem 1.5rem 0.75rem;
-    margin-bottom: 1.5rem;
-    break-after: avoid;
-  }
-
-  /* Typographie des paragraphes en colonnes */
-  .chapter-track > p {
-    font-family: 'Merriweather', Georgia, serif;
-    font-size: 1.05rem;
-    line-height: 1.85;
-    color: var(--text-primary);
-    margin-bottom: 1.4em;
-    text-align: justify;
-    hyphens: none;
-    -webkit-hyphens: none;
-  }
-
-  /* CTA fin de chapitre en mode colonnes */
-  .chapter-track > .chapter-end-cta {
-    padding-top: 3rem;
-    text-align: center;
   }
 
   /* Flèches : repositionnées en bas, 3.5rem suffit à dépasser la barre gestuelle
