@@ -692,21 +692,30 @@ h2::after {
     min-height: 44px;
   }
 
-  /* Progress indicator — lisible sur mobile */
+  /* Progress indicator — pastille flottante bas-droite sur mobile */
   .reader-progress-container {
-    width: 130px;
-    gap: 0.6rem;
+    position: fixed;
+    bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));
+    right: 1rem;
+    width: auto;
+    gap: 0;
+    background: rgba(10, 10, 10, 0.72);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 2rem;
+    padding: 0.3rem 0.75rem;
+    z-index: 2002;
   }
 
   .reader-progress-text {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--text-primary);
-    min-width: 40px;
+    min-width: auto;
   }
 
   .reader-progress-bar {
-    height: 5px;
+    display: none;
   }
 
   /* Optimized comments section for mobile */
