@@ -1476,11 +1476,13 @@ h2::after {
 
   /* Padding et typographie des pages en lecture mobile.
      padding-bottom 4rem : marge de sécurité au-dessus de la barre gestuelle Android.
-     scroll-snap : alignement automatique, une page à la fois. */
+     overflow: hidden forcé : empêche le débordement visible entre pages.
+     scroll-snap : alignement CSS natif (complété par un snap JS de secours). */
   .chapter-page {
     padding: 1.5rem 1.5rem 4rem !important;
     font-size: 1.05rem;
     line-height: 2.05;
+    overflow: hidden;
     scroll-snap-align: start;
     scroll-snap-stop: always;
   }

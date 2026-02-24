@@ -326,11 +326,21 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
   }
 
   function _attachMobileScroll(pageHeight) {
-    // Le snap est géré nativement par CSS scroll-snap-type: y mandatory.
-    // On écoute uniquement pour mettre à jour la progression.
+    // CSS scroll-snap-type: y mandatory est déclaré sur le carousel, mais les pages
+    // sont des petits-enfants (pas enfants directs) — certains Chrome Android ignorent
+    // le snap dans ce cas. On ajoute un snap JS 80 ms après la fin du scroll comme
+    // filet de sécurité : il ne fait rien si le snap CSS a déjà corrigé la position.
+    let snapTimer;
     mobileScrollHandler = () => {
       currentPage = Math.round(carousel.scrollTop / pageHeight) + 1;
       updateProgress();
+      clearTimeout(snapTimer);
+      snapTimer = setTimeout(() => {
+        const target = Math.round(carousel.scrollTop / pageHeight) * pageHeight;
+        if (Math.abs(carousel.scrollTop - target) > 2) {
+          carousel.scrollTo({ top: target, behavior: 'smooth' });
+        }
+      }, 80);
     };
     carousel.addEventListener('scroll', mobileScrollHandler, { passive: true });
 
