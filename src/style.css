@@ -1505,23 +1505,10 @@ h2::after {
     margin-right: auto;
   }
 
-  /* Flèches : repositionnées en bas, 3.5rem suffit à dépasser la barre gestuelle
-     Android (~48px max) sans dépendre de env() qui retourne 0 sur Chrome Android. */
+  /* Flèches masquées sur mobile : la navigation se fait par swipe vertical */
   .nav-btn {
-    top: auto;
-    bottom: 3.5rem;
-    transform: none;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    font-size: 1.4rem;
-    opacity: 0.75;
+    display: none;
   }
-
-  .nav-btn.prev { left: 0.75rem; }
-  .nav-btn.next { right: 0.75rem; }
-
-  .nav-btn:disabled { opacity: 0.2; }
 
   /* Bouton soutien dans la nav visible sur mobile */
   .btn-support-nav {
