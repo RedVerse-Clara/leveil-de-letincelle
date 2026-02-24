@@ -310,17 +310,6 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     currentPage = 1;
     updateProgress();
     scrollPage(Math.min(restorePage, totalPages || 1), true);
-    if (isMobile) _showSwipeHint();
-  }
-
-  function _showSwipeHint() {
-    if (sessionStorage.getItem('swipeHintShown')) return;
-    sessionStorage.setItem('swipeHintShown', '1');
-    const hint = document.createElement('div');
-    hint.className = 'swipe-hint';
-    hint.textContent = '↑ Glisser pour tourner les pages';
-    overlay.appendChild(hint);
-    setTimeout(() => hint.remove(), 3100);
   }
 
   // Mettre à jour la progression
