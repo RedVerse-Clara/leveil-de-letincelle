@@ -1,4 +1,3 @@
-
 import './style.css';
 import { createAshParticles } from './utils/particles.js';
 import { renderNavigation, initNavigation } from './components/Navigation.js';
@@ -13,7 +12,7 @@ import { updateSEO } from './utils/seo.js'; // Import SEO manager
 // We construct the element dynamically when a chapter is opened
 const CUSDIS_APP_ID = "f4c40187-515a-4943-a0c6-f498019a4115";
 
-function loadComments(chapterId, title, stripeLink) {
+function loadComments(chapterId, title) {
   const container = document.getElementById('comments-container');
   if (!container) return;
 
@@ -52,20 +51,7 @@ function loadComments(chapterId, title, stripeLink) {
     noticeContainer.appendChild(notice);
   }
 
-  // Add support button in separate container (always visible, outside scrollable area)
-  const supportContainer = document.getElementById('support-button-container');
-  if (supportContainer && stripeLink) {
-    supportContainer.innerHTML = ''; // Clear any previous button
-
-    const supportButton = document.createElement('a');
-    supportButton.href = stripeLink;
-    supportButton.target = "_blank";
-    supportButton.rel = "noopener noreferrer";
-    supportButton.className = "btn-support";
-    supportButton.innerHTML = '<span class="icon">❤️</span> Soutenir le projet';
-
-    supportContainer.appendChild(supportButton);
-  }
+  // Le bouton de soutien est rendu statiquement dans le template ChapterReader
 }
 
 // Global Listener to try and catch post success if emitted
@@ -75,29 +61,6 @@ window.addEventListener('message', (e) => {
     // For now, the visual refresh of the iframe is the main cue.
   }
 });
-/*
-  Correction: The standard Cusdis script doesn't always broadcast 'onPost' to parent window easily without custom setup.
-  However, we can use a workaround:
-  The iFrame *reloads* or changes state.
-  
-  Actually, let's try to use the `onCusdisPost` hook if possible? No, that's for React usually.
-  
-  Let's try to add a MutationObserver on the iframe to see if it changes? No, cross-origin.
-  
-  Wait, let's trust the standard behavior or use a visual cue.
-  Actually, Cusdis 1.0+ might emit `onPost`.
-  Let's try implementing a generic handler that we can verify.
-  
-  Refined Plan: 
-  I'll add the listener. If it doesn't work out of the box, I will add a small permanent notice below the box:
-  "Note: Les commentaires apparaissent après validation."
-  This is a safer UX pattern if technical detection is flaky.
-  
-  BUT, let's try to implement the helper message first.
-*/
-// Let's stick to adding a static helper text for now, it's 100% reliable.
-// "Votre commentaire sera visible après validation par le modérateur."
-
 
 // ============================================
 // MAIN APP LOGIC
@@ -188,11 +151,14 @@ function openChapter(chapterId) {
   // Update SEO for Chapter
   updateSEO('chapter', chapter);
 
+  const currentIndex = chaptersData.chapters.findIndex(c => c.id === chapterId);
+  const nextChapter = currentIndex < chaptersData.chapters.length - 1 ? chaptersData.chapters[currentIndex + 1] : null;
+
   // Render the reader overlay
-  readerContainer.innerHTML = renderChapterReader(chapter, chaptersData.chapters);
+  readerContainer.innerHTML = renderChapterReader(chapter, chaptersData.presentation.stripeLink);
 
   // Initialize Comments for this chapter
-  loadComments(chapter.id, chapter.title, chaptersData.presentation.stripeLink);
+  loadComments(chapter.id, chapter.title);
 
   // Update URL hash
   history.pushState({ chapterId }, '', `#${chapterId}`);
@@ -208,48 +174,308 @@ function openChapter(chapterId) {
   document.body.style.overflow = 'hidden';
 
   // Attach event listeners for the reader
-  attachReaderEvents(overlay);
+  attachReaderEvents(overlay, chapter, nextChapter);
 }
 
-function attachReaderEvents(overlay) {
+function attachReaderEvents(overlay, chapter, nextChapter = null) {
   const closeBtn = overlay.querySelector('.btn-close-reader');
-  // Handle main overlay scroll for reading progress
-  const scrollContainer = overlay;
+  const track = overlay.querySelector('.chapter-track');
+  const carousel = track.parentElement; // chapter-carousel
   const progressBar = overlay.querySelector('.reader-progress-fill');
   const progressText = overlay.querySelector('.reader-progress-text');
 
+  // Controls
+  const settingsBtn = overlay.querySelector('.btn-settings-reader');
+  const settingsPanel = overlay.querySelector('.settings-panel');
+  const fontChoiceBtns = overlay.querySelectorAll('.font-choice-btn');
+  const fontSizeBtns = overlay.querySelectorAll('.font-btn');
+  const prevPageBtn = overlay.querySelector('.nav-btn.prev');
+  const nextPageBtn = overlay.querySelector('.nav-btn.next');
+
+  let totalPages = 1;
+  let currentPage = 1;
+  let pageElements = [];
+  let touchStartX = 0;
+  let touchEndX = 0;
+  let mobileScrollHandler = null; // listener sur carousel en mode colonnes
+
+  function createHorizontalPages() {
+    track.innerHTML = '';
+    pageElements = [];
+
+    // Nettoyer l'ancien listener mobile si présent (évite les doublons au resize)
+    if (mobileScrollHandler) {
+      carousel.removeEventListener('scroll', mobileScrollHandler);
+      mobileScrollHandler = null;
+    }
+
+    const isMobile = window.innerWidth <= 768;
+
+    // Sur mobile : le track doit être flex (comme desktop) pour enchaîner les pages
+    // horizontalement. Le carousel (overflow-x: auto) gère le scroll.
+    if (isMobile) {
+      track.style.cssText = `display:flex;height:${carousel.offsetHeight}px;width:max-content;overflow:visible;`;
+    }
+
+    // Dimensions d'une page = dimensions visibles du conteneur de scroll
+    const pageWidth  = isMobile ? carousel.offsetWidth  : track.offsetWidth;
+    const pageHeight = isMobile ? carousel.offsetHeight : track.offsetHeight;
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = chapter.content;
+    const children = Array.from(tempDiv.children);
+
+    // Crée une nouvelle page et l'insère dans le track
+    function startPage(isFirst) {
+      const p = document.createElement('div');
+      p.className = isFirst ? 'chapter-page chapter-page--first' : 'chapter-page';
+      p.style.width  = `${pageWidth}px`;
+      p.style.height = `${pageHeight}px`;
+      if (isFirst) {
+        const h = document.createElement('h2');
+        h.className = 'chapter-page-title';
+        h.textContent = chapter.title;
+        p.appendChild(h);
+      }
+      track.appendChild(p);
+      pageElements.push(p);
+      return p;
+    }
+
+    if (!children.length) {
+      const p = startPage(true);
+      p.insertAdjacentHTML('beforeend', chapter.content);
+      totalPages = 1; currentPage = 1;
+      updateProgress(); scrollPage(1);
+      if (isMobile) _attachMobileScroll(pageWidth);
+      return;
+    }
+
+    let activePage = startPage(true);
+
+    for (const child of children) {
+      activePage.appendChild(child);
+
+      // Vérification du débordement réel dans le DOM
+      if (activePage.scrollHeight > activePage.clientHeight + 2) {
+        // Combien d'éléments de contenu (hors titre) la page contient-elle ?
+        const titleOffset = pageElements.length === 1 ? 1 : 0;
+        const contentCount = activePage.children.length - titleOffset;
+
+        if (contentCount > 1) {
+          // On retire cet élément et on l'envoie sur une nouvelle page
+          activePage.removeChild(child);
+          activePage = startPage(false);
+          activePage.appendChild(child);
+        }
+        // Sinon : élément unique trop grand → on l'accepte tel quel
+      }
+    }
+
+    // Page dédiée pour le CTA "Chapitre suivant" — jamais tronquée
+    if (nextChapter) {
+      const endPage = startPage(false);
+      endPage.classList.add('chapter-page--end');
+      endPage.innerHTML = `
+        <div class="chapter-end-cta">
+          <p class="chapter-end-label">Fin du chapitre</p>
+          <button class="btn btn-nav-chapter chapter-end-btn" data-id="${nextChapter.id}">
+            ${nextChapter.title} →
+          </button>
+        </div>
+      `;
+    }
+
+    totalPages = pageElements.length || 1;
+    currentPage = 1;
+    updateProgress();
+    scrollPage(1);
+
+    if (isMobile) _attachMobileScroll(pageWidth);
+  }
+
+  function _attachMobileScroll(pageWidth) {
+    // Snap programmatique + mise à jour de la progression
+    let snapTimer;
+    mobileScrollHandler = () => {
+      currentPage = Math.round(carousel.scrollLeft / pageWidth) + 1;
+      updateProgress();
+      clearTimeout(snapTimer);
+      snapTimer = setTimeout(() => {
+        const target = Math.round(carousel.scrollLeft / pageWidth) * pageWidth;
+        if (Math.abs(carousel.scrollLeft - target) > 2) {
+          carousel.scrollTo({ left: target, behavior: 'smooth' });
+        }
+      }, 80);
+    };
+    carousel.addEventListener('scroll', mobileScrollHandler, { passive: true });
+
+    // Hint swipe : montrer une seule fois par session
+    if (!sessionStorage.getItem('swipeHintShown')) {
+      sessionStorage.setItem('swipeHintShown', '1');
+      const hint = document.createElement('div');
+      hint.className = 'swipe-hint';
+      hint.textContent = '← Glisser pour tourner les pages →';
+      overlay.appendChild(hint);
+      setTimeout(() => hint.remove(), 3100);
+    }
+  }
+
+  // Mettre à jour la progression
+  function updateProgress() {
+    if (totalPages === 0) return;
+    
+    progressText.textContent = `Page ${currentPage} sur ${totalPages}`;
+    
+    const scrollPercent = totalPages > 1 ? ((currentPage - 1) / (totalPages - 1)) * 100 : 100;
+    progressBar.style.width = `${scrollPercent}%`;
+    
+    // Mettre à jour les boutons de navigation
+    prevPageBtn.disabled = currentPage === 1;
+    nextPageBtn.disabled = currentPage === totalPages;
+  }
+
+  // Naviguer vers une page spécifique
+  function scrollPage(pageNum) {
+    if (pageNum < 1 || pageNum > totalPages) return;
+    currentPage = pageNum;
+    const sc = window.innerWidth <= 768 ? carousel : track;
+    sc.scrollTo({ left: (pageNum - 1) * sc.offsetWidth, behavior: 'smooth' });
+    updateProgress();
+  }
+
+  // Naviguer à la page suivante/précédente
+  function goToPage(dir) {
+    const newPage = currentPage + dir;
+    if (newPage >= 1 && newPage <= totalPages) {
+      scrollPage(newPage);
+    }
+  }
+
+  // Touch Events for mobile swipe
+  const handleTouchStart = (e) => {
+    touchStartX = e.changedTouches[0].screenX;
+  };
+
+  const handleTouchEnd = (e) => {
+    touchEndX = e.changedTouches[0].screenX;
+    handleSwipe();
+  };
+
+  const handleSwipe = () => {
+    if (touchEndX < touchStartX - 50) {
+      // Swipe gauche
+      goToPage(1);
+    }
+    if (touchEndX > touchStartX + 50) {
+      // Swipe droite
+      goToPage(-1);
+    }
+  };
+
+  // Event Listeners
+  prevPageBtn.addEventListener('click', () => goToPage(-1));
+  nextPageBtn.addEventListener('click', () => goToPage(1));
+
+  // Keyboard Navigation
+  const handleKeydown = (e) => {
+    if (e.key === 'ArrowLeft') goToPage(-1);
+    if (e.key === 'ArrowRight') goToPage(1);
+    if (e.key === 'Escape') closeReader();
+  };
+  window.addEventListener('keydown', handleKeydown);
+
+  // Touch Events
+  track.addEventListener('touchstart', handleTouchStart);
+  track.addEventListener('touchend', handleTouchEnd);
+
   // Close Reader
   closeBtn.addEventListener('click', () => {
+    window.removeEventListener('keydown', handleKeydown);
     closeReader();
-    // Revert URL cleanly
     history.pushState(null, '', window.location.pathname);
   });
 
-  // Scroll Progress Logic
-  scrollContainer.addEventListener('scroll', () => {
-    const scrollTop = scrollContainer.scrollTop;
-    const scrollHeight = scrollContainer.scrollHeight - scrollContainer.clientHeight;
-
-    let scrollPercent = 0;
-    if (scrollHeight > 0) {
-      scrollPercent = (scrollTop / scrollHeight) * 100;
-    }
-
-    scrollPercent = Math.min(100, Math.max(0, scrollPercent));
-
-    progressBar.style.width = `${scrollPercent}%`;
-    progressText.textContent = `${Math.round(scrollPercent)}% lu`;
+  // Settings Panel
+  settingsBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    settingsPanel.classList.toggle('active');
   });
 
-  // Navigation between chapters
-  const navBtns = overlay.querySelectorAll('.btn-nav-chapter');
-  navBtns.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const nextId = btn.getAttribute('data-id');
-      closeReader();
-      setTimeout(() => openChapter(nextId), 300);
+  overlay.addEventListener('click', (e) => {
+    if (!settingsPanel.contains(e.target) && e.target !== settingsBtn) {
+      settingsPanel.classList.remove('active');
+    }
+  });
+
+  // Font Choice
+  fontChoiceBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const font = btn.getAttribute('data-font');
+      overlay.setAttribute('data-font', font);
+      fontChoiceBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Recréer les pages avec la nouvelle police
+      setTimeout(createHorizontalPages, 100);
     });
   });
+
+  // Font Size
+  fontSizeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const size = btn.getAttribute('data-size');
+      overlay.setAttribute('data-font-size', size);
+      fontSizeBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Recréer les pages avec la nouvelle taille
+      setTimeout(createHorizontalPages, 100);
+    });
+  });
+
+  // Panneau commentaires
+  const commentsBtn = overlay.querySelector('.btn-comments-reader');
+  const sidebar = overlay.querySelector('.reader-sidebar');
+  const closeCommentsBtn = overlay.querySelector('.btn-close-comments');
+  if (commentsBtn && sidebar) {
+    commentsBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
+    closeCommentsBtn?.addEventListener('click', () => sidebar.classList.remove('active'));
+  }
+
+  // Navigation entre les chapitres — délégation pour couvrir le CTA dynamique
+  track.addEventListener('click', (e) => {
+    const navBtn = e.target.closest('.btn-nav-chapter');
+    if (navBtn) {
+      window.removeEventListener('keydown', handleKeydown);
+      const nextId = navBtn.getAttribute('data-id');
+      closeReader();
+      setTimeout(() => openChapter(nextId), 300);
+    }
+  });
+
+  // Initialiser les pages une fois Merriweather effectivement rendue
+  // document.fonts.ready peut résoudre avant le chargement lazy du overlay —
+  // on force explicitement le chargement de Merriweather avant de mesurer.
+  const handleResize = () => { createHorizontalPages(); };
+
+  // On charge la police principale ; .catch() garantit que les pages sont
+  // créées même si la police ne peut pas être chargée (réseau, cache, etc.)
+  document.fonts.load('1rem "Merriweather"')
+    .catch(() => {})
+    .then(() => {
+      createHorizontalPages();
+      window.addEventListener('resize', handleResize);
+    });
+
+  overlay.addEventListener('close-reader', () => {
+    window.removeEventListener('resize', handleResize);
+    window.removeEventListener('keydown', handleKeydown);
+    if (mobileScrollHandler) {
+      carousel.removeEventListener('scroll', mobileScrollHandler);
+      mobileScrollHandler = null;
+    }
+  }, { once: true });
 }
 
 function closeReader() {
@@ -260,6 +486,7 @@ function closeReader() {
   updateSEO('home');
 
   if (overlay) {
+    overlay.dispatchEvent(new CustomEvent('close-reader'));
     overlay.classList.remove('active');
     setTimeout(() => {
       readerContainer.innerHTML = '';
@@ -269,7 +496,7 @@ function closeReader() {
 }
 
 // Handle Browser Back Button
-window.addEventListener('popstate', (event) => {
+window.addEventListener('popstate', () => {
   // If we are back to root or non-chapter hash, close reader
   if (!window.location.hash.includes('chapter-')) {
     closeReader();
