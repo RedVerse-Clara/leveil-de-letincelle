@@ -22,9 +22,6 @@
   /* Animation */
   --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 
-  /* Safe-area insets (viewport-fit=cover) — 0px fallback on unsupported devices */
-  --safe-top: env(safe-area-inset-top, 0px);
-  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 *,
@@ -195,8 +192,8 @@ h2::after {
   top: 0;
   left: 0;
   width: 100%;
-  height: calc(var(--header-height) + var(--safe-top));
-  padding-top: var(--safe-top);
+  height: calc(var(--header-height) + env(safe-area-inset-top, 0px));
+  padding-top: env(safe-area-inset-top, 0px);
   z-index: 1000;
   transition: background 0.3s ease;
 
@@ -374,7 +371,7 @@ h2::after {
   align-items: center;
   text-align: center;
   position: relative;
-  padding-top: calc(var(--header-height) + var(--safe-top));
+  padding-top: calc(var(--header-height) + env(safe-area-inset-top, 0px));
   background:
     radial-gradient(ellipse at 50% 55%, rgba(0, 243, 255, 0.06) 0%, transparent 55%),
     radial-gradient(ellipse at 30% 75%, rgba(201, 162, 39, 0.04) 0%, transparent 50%),
@@ -962,7 +959,7 @@ h2::after {
   top: 0;
   left: 0;
   width: 100%;
-  height: calc(60px + var(--safe-top));
+  height: calc(60px + env(safe-area-inset-top, 0px));
   /* Glassmorphism nav */
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
@@ -970,7 +967,7 @@ h2::after {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--safe-top) 2rem 0;
+  padding: env(safe-area-inset-top, 0px) 2rem 0;
   z-index: 2001;
 }
 
@@ -1106,7 +1103,7 @@ h2::after {
 /* Carousel — zone de lecture fixe sous la nav, laisse 300px pour la sidebar */
 .chapter-carousel {
   position: fixed;
-  top: calc(60px + var(--safe-top));
+  top: calc(60px + env(safe-area-inset-top, 0px));
   left: 0;
   right: 300px;
   bottom: 0;
@@ -1459,7 +1456,7 @@ h2::after {
   /* Carousel = conteneur de scroll horizontal sur mobile */
   .chapter-carousel {
     right: 0;
-    bottom: var(--safe-bottom);
+    bottom: env(safe-area-inset-bottom, 0px);
     overflow-x: auto;
     overflow-y: hidden;
     scrollbar-width: none;
@@ -1532,7 +1529,7 @@ h2::after {
   /* Flèches : repositionnées en bas, au-dessus de la zone gestuelle Android */
   .nav-btn {
     top: auto;
-    bottom: calc(var(--safe-bottom) + 0.75rem);
+    bottom: calc(max(env(safe-area-inset-bottom, 0px), 48px) + 0.75rem);
     transform: none;
     width: 44px;
     height: 44px;

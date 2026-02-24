@@ -212,13 +212,15 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     const isMobile = window.innerWidth <= 768;
 
     // Dimensions d'une page.
-    // Sur mobile : visualViewport.height exclut l'URL bar et la barre de gestes Android,
-    // garantissant que le padding-bottom de sécurité reste toujours visible à l'écran.
     const pageWidth = isMobile ? carousel.offsetWidth : track.offsetWidth;
-    // carousel.clientHeight = hauteur CSS réelle (top:60px → bottom:0), toujours
-    // synchronisée avec le rendu visuel quelle que soit la densité de l'écran.
+    // Sur Android avec navigation par gestes, env(safe-area-inset-bottom) retourne parfois 0
+    // malgré viewport-fit=cover. On soustrait un buffer fixe (56 px) pour garantir que le
+    // contenu reste toujours au-dessus de la barre de gestes (~40-48 px max).
+    // Sur iOS, Safari gère lui-même les insets ; aucun buffer supplémentaire n'est nécessaire.
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const bottomBuffer = (isMobile && isAndroid) ? 56 : 0;
     const pageHeight = isMobile
-      ? Math.max(200, carousel.clientHeight)
+      ? Math.max(200, carousel.clientHeight - bottomBuffer)
       : track.offsetHeight;
 
     if (isMobile) {
