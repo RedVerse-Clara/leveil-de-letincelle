@@ -199,7 +199,7 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
   let touchEndX = 0;
   let mobileScrollHandler = null; // listener sur carousel en mode colonnes
 
-  function createHorizontalPages() {
+  function createHorizontalPages(restorePage = 1) {
     track.innerHTML = '';
     pageElements = [];
 
@@ -211,15 +211,17 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
 
     const isMobile = window.innerWidth <= 768;
 
-    // Sur mobile : le track doit être flex (comme desktop) pour enchaîner les pages
-    // horizontalement. Le carousel (overflow-x: auto) gère le scroll.
-    if (isMobile) {
-      track.style.cssText = `display:flex;height:${carousel.offsetHeight}px;width:max-content;overflow:visible;`;
-    }
+    // Dimensions d'une page.
+    // Sur mobile : visualViewport.height exclut l'URL bar et la barre de gestes Android,
+    // garantissant que le padding-bottom de sécurité reste toujours visible à l'écran.
+    const pageWidth = isMobile ? carousel.offsetWidth : track.offsetWidth;
+    const pageHeight = isMobile
+      ? Math.max(200, (window.visualViewport?.height ?? window.innerHeight) - 60)
+      : track.offsetHeight;
 
-    // Dimensions d'une page = dimensions visibles du conteneur de scroll
-    const pageWidth  = isMobile ? carousel.offsetWidth  : track.offsetWidth;
-    const pageHeight = isMobile ? carousel.offsetHeight : track.offsetHeight;
+    if (isMobile) {
+      track.style.cssText = `display:flex;height:${pageHeight}px;width:max-content;overflow:visible;`;
+    }
 
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = chapter.content;
@@ -246,9 +248,31 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
       const p = startPage(true);
       p.insertAdjacentHTML('beforeend', chapter.content);
       totalPages = 1; currentPage = 1;
-      updateProgress(); scrollPage(1);
+      updateProgress(); scrollPage(1, true);
       if (isMobile) _attachMobileScroll(pageWidth);
       return;
+    }
+
+    // Coupe un paragraphe en deux pour remplir la page courante avant d'en commencer
+    // une nouvelle. Recherche binaire sur les mots pour trouver la coupure maximale
+    // qui ne provoque pas de débordement. Retourne { first, second } ou null.
+    function trySplitParagraph(para) {
+      const words = para.textContent.trim().split(/\s+/);
+      if (words.length < 5) return null;
+      const probe = para.cloneNode(false);
+      activePage.appendChild(probe);
+      let lo = 1, hi = words.length - 1, best = 0;
+      while (lo <= hi) {
+        const mid = (lo + hi) >> 1;
+        probe.textContent = words.slice(0, mid).join(' ');
+        if (activePage.scrollHeight <= activePage.clientHeight + 2) { best = mid; lo = mid + 1; }
+        else { hi = mid - 1; }
+      }
+      activePage.removeChild(probe);
+      if (best < 3) return null;
+      const first  = para.cloneNode(false); first.textContent  = words.slice(0, best).join(' ');
+      const second = para.cloneNode(false); second.textContent = words.slice(best).join(' ');
+      return { first, second };
     }
 
     let activePage = startPage(true);
@@ -258,15 +282,21 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
 
       // Vérification du débordement réel dans le DOM
       if (activePage.scrollHeight > activePage.clientHeight + 2) {
-        // Combien d'éléments de contenu (hors titre) la page contient-elle ?
         const titleOffset = pageElements.length === 1 ? 1 : 0;
         const contentCount = activePage.children.length - titleOffset;
 
         if (contentCount > 1) {
-          // On retire cet élément et on l'envoie sur une nouvelle page
           activePage.removeChild(child);
-          activePage = startPage(false);
-          activePage.appendChild(child);
+          // Tenter un découpage mot à mot pour remplir la page courante
+          const split = child.tagName === 'P' ? trySplitParagraph(child) : null;
+          if (split) {
+            activePage.appendChild(split.first);
+            activePage = startPage(false);
+            activePage.appendChild(split.second);
+          } else {
+            activePage = startPage(false);
+            activePage.appendChild(child);
+          }
         }
         // Sinon : élément unique trop grand → on l'accepte tel quel
       }
@@ -289,7 +319,7 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     totalPages = pageElements.length || 1;
     currentPage = 1;
     updateProgress();
-    scrollPage(1);
+    scrollPage(Math.min(restorePage, totalPages || 1), true);
 
     if (isMobile) _attachMobileScroll(pageWidth);
   }
@@ -336,11 +366,11 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
   }
 
   // Naviguer vers une page spécifique
-  function scrollPage(pageNum) {
+  function scrollPage(pageNum, instant = false) {
     if (pageNum < 1 || pageNum > totalPages) return;
     currentPage = pageNum;
     const sc = window.innerWidth <= 768 ? carousel : track;
-    sc.scrollTo({ left: (pageNum - 1) * sc.offsetWidth, behavior: 'smooth' });
+    sc.scrollTo({ left: (pageNum - 1) * sc.offsetWidth, behavior: instant ? 'instant' : 'smooth' });
     updateProgress();
   }
 
@@ -457,7 +487,7 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
   // Initialiser les pages une fois Merriweather effectivement rendue
   // document.fonts.ready peut résoudre avant le chargement lazy du overlay —
   // on force explicitement le chargement de Merriweather avant de mesurer.
-  const handleResize = () => { createHorizontalPages(); };
+  const handleResize = () => { createHorizontalPages(currentPage); };
 
   // On charge la police principale ; .catch() garantit que les pages sont
   // créées même si la police ne peut pas être chargée (réseau, cache, etc.)
@@ -466,11 +496,14 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     .then(() => {
       createHorizontalPages();
       window.addEventListener('resize', handleResize);
+      // Recalculer aussi quand l'URL bar apparaît/disparaît sur mobile
+      if (window.visualViewport) window.visualViewport.addEventListener('resize', handleResize);
     });
 
   overlay.addEventListener('close-reader', () => {
     window.removeEventListener('resize', handleResize);
     window.removeEventListener('keydown', handleKeydown);
+    if (window.visualViewport) window.visualViewport.removeEventListener('resize', handleResize);
     if (mobileScrollHandler) {
       carousel.removeEventListener('scroll', mobileScrollHandler);
       mobileScrollHandler = null;
