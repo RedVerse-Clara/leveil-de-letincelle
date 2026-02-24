@@ -368,12 +368,9 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
   };
 
   const handleTouchEnd = (e) => {
-    const dx = e.changedTouches[0].screenX - touchStartX;
-    const dy = e.changedTouches[0].screenY - touchStartY;
-    if (window.innerWidth <= 768) {
-      if (dy < -50) goToPage(1);   // Swipe haut → page suivante
-      if (dy > 50)  goToPage(-1);  // Swipe bas  → page précédente
-    } else {
+    // Mobile : navigation par boutons ↑/↓, pas par swipe (évite les changements accidentels)
+    if (window.innerWidth > 768) {
+      const dx = e.changedTouches[0].screenX - touchStartX;
       if (dx < -50) goToPage(1);   // Swipe gauche → page suivante
       if (dx > 50)  goToPage(-1);  // Swipe droite → page précédente
     }

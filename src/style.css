@@ -1545,9 +1545,42 @@ h2::after {
     margin-right: auto;
   }
 
-  /* Flèches masquées sur mobile : la navigation se fait par swipe vertical */
+  /* Boutons navigation mobile — cercles ↑/↓ discrets, côté droit */
   .nav-btn {
-    display: none;
+    display: flex;
+    top: auto;
+    left: auto;
+    transform: none;
+    right: 0.75rem;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 0;
+    background: rgba(10, 10, 10, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    z-index: 2003;
+  }
+
+  .nav-btn.prev { bottom: 6.5rem; }
+  .nav-btn.next { bottom: 3.5rem; }
+
+  .nav-btn.prev::before {
+    content: '↑';
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  .nav-btn.next::before {
+    content: '↓';
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Settings panel ancré à droite sur mobile */
+  .settings-panel {
+    right: 0.5rem;
+    min-width: 0;
+    width: min(280px, calc(100vw - 1rem));
   }
 
   /* Bouton soutien dans la nav visible sur mobile */
