@@ -327,7 +327,7 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
   function updateProgress() {
     if (totalPages === 0) return;
     
-    progressText.textContent = `Page ${currentPage} sur ${totalPages}`;
+    progressText.textContent = `${currentPage} / ${totalPages}`;
     
     const scrollPercent = totalPages > 1 ? ((currentPage - 1) / (totalPages - 1)) * 100 : 100;
     progressBar.style.width = `${scrollPercent}%`;
