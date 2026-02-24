@@ -692,7 +692,7 @@ h2::after {
     min-height: 44px;
   }
 
-  /* Progress indicator — barre de progression pleine largeur en bas */
+  /* Progress indicator — numéro + barre pleine largeur en bas */
   .reader-progress-container {
     position: fixed;
     bottom: 0;
@@ -701,6 +701,7 @@ h2::after {
     width: 100%;
     padding: 0;
     gap: 0;
+    flex-direction: column;
     background: none;
     border: none;
     border-radius: 0;
@@ -709,7 +710,14 @@ h2::after {
   }
 
   .reader-progress-text {
-    display: none;
+    display: block;
+    width: 100%;
+    text-align: right;
+    font-size: 0.65rem;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.3);
+    padding: 0 0.6rem 0.2rem;
+    min-width: auto;
   }
 
   .reader-progress-bar {
