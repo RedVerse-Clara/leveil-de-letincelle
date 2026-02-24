@@ -194,6 +194,7 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
 
   let totalPages = 1;
   let currentPage = 1;
+  let currentPageHeight = 0; // hauteur de page utilisée à la création — référence unique pour scrollPage et snap JS
   let pageElements = [];
   let touchStartX = 0;
   let touchEndX = 0;
@@ -219,6 +220,7 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     const pageHeight = isMobile
       ? Math.max(200, carousel.clientHeight)
       : track.offsetHeight;
+    currentPageHeight = pageHeight; // synchronise la référence utilisée par scrollPage et le snap JS
 
     if (isMobile) {
       track.style.cssText = `display:flex;flex-direction:column;height:auto;overflow:visible;`;
@@ -374,8 +376,8 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     if (pageNum < 1 || pageNum > totalPages) return;
     currentPage = pageNum;
     if (window.innerWidth <= 768) {
-      // Mobile : scroll vertical, chaque page = hauteur du carousel
-      carousel.scrollTo({ top: (pageNum - 1) * carousel.clientHeight, behavior: instant ? 'instant' : 'smooth' });
+      // Mobile : scroll vertical, chaque page = currentPageHeight (valeur capturée à la création des pages)
+      carousel.scrollTo({ top: (pageNum - 1) * currentPageHeight, behavior: instant ? 'instant' : 'smooth' });
     } else {
       // Desktop : scroll horizontal
       track.scrollTo({ left: (pageNum - 1) * track.offsetWidth, behavior: instant ? 'instant' : 'smooth' });
