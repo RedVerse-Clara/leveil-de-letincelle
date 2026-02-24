@@ -1476,6 +1476,11 @@ h2::after {
 }
 
 @media (max-width: 768px) {
+  /* Nav opaque sur mobile — évite que le texte des pages transparaisse derrière */
+  .reader-nav {
+    background: rgba(8, 8, 8, 0.93);
+  }
+
   /* Carousel = conteneur de positionnement (plus de scroll sur mobile).
      Les pages sont empilées en position:absolute, une seule visible à la fois. */
   .chapter-carousel {
@@ -1505,12 +1510,14 @@ h2::after {
     line-height: 2.05;
     overflow-y: auto;
     opacity: 0;
+    transform: translateY(14px);
     pointer-events: none;
-    transition: opacity 0.25s ease;
+    transition: opacity 0.35s ease, transform 0.35s ease;
   }
 
   .chapter-page--active {
     opacity: 1;
+    transform: translateY(0);
     pointer-events: auto;
     z-index: 1;
   }
