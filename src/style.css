@@ -1453,29 +1453,36 @@ h2::after {
 }
 
 @media (max-width: 768px) {
-  /* Carousel = conteneur de scroll horizontal sur mobile */
+  /* Carousel = conteneur de scroll vertical par pages sur mobile.
+     bottom: 0 intentionnel : le padding-bottom des pages crée la marge de sécurité
+     vis-à-vis de la barre gestuelle Android, sans dépendre de env() qui retourne 0. */
   .chapter-carousel {
     right: 0;
-    bottom: env(safe-area-inset-bottom, 0px);
-    overflow-x: auto;
-    overflow-y: hidden;
+    bottom: 0;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scroll-snap-type: y mandatory;
     scrollbar-width: none;
   }
 
   .chapter-carousel::-webkit-scrollbar { display: none; }
 
-  /* Track = flex (pages enchaînées horizontalement, styles finaux injectés par JS) */
+  /* Track = flex colonne (pages empilées verticalement, styles injectés par JS) */
   .chapter-track {
     display: flex;
+    flex-direction: column;
     overflow: visible;
   }
 
   /* Padding et typographie des pages en lecture mobile.
-     padding-bottom 4rem : marge de sécurité toujours visible au bas de chaque page. */
+     padding-bottom 4rem : marge de sécurité au-dessus de la barre gestuelle Android.
+     scroll-snap : alignement automatique, une page à la fois. */
   .chapter-page {
     padding: 1.5rem 1.5rem 4rem !important;
     font-size: 1.05rem;
     line-height: 2.05;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
   }
 
   /* Titre de chapitre sur la première page mobile */
@@ -1526,10 +1533,11 @@ h2::after {
     text-align: center;
   }
 
-  /* Flèches : repositionnées en bas, au-dessus de la zone gestuelle Android */
+  /* Flèches : repositionnées en bas, 3.5rem suffit à dépasser la barre gestuelle
+     Android (~48px max) sans dépendre de env() qui retourne 0 sur Chrome Android. */
   .nav-btn {
     top: auto;
-    bottom: calc(max(env(safe-area-inset-bottom, 0px), 48px) + 0.75rem);
+    bottom: 3.5rem;
     transform: none;
     width: 44px;
     height: 44px;

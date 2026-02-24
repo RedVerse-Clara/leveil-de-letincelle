@@ -212,19 +212,16 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     const isMobile = window.innerWidth <= 768;
 
     // Dimensions d'une page.
+    // Sur mobile, le carousel utilise scroll-snap vertical : chaque page fait exactement
+    // la hauteur du carousel. Le padding-bottom CSS (4rem) crée la marge de sécurité
+    // vis-à-vis de la barre gestuelle Android sans nécessiter de calcul JS.
     const pageWidth = isMobile ? carousel.offsetWidth : track.offsetWidth;
-    // Sur Android avec navigation par gestes, env(safe-area-inset-bottom) retourne parfois 0
-    // malgré viewport-fit=cover. On soustrait un buffer fixe (56 px) pour garantir que le
-    // contenu reste toujours au-dessus de la barre de gestes (~40-48 px max).
-    // Sur iOS, Safari gère lui-même les insets ; aucun buffer supplémentaire n'est nécessaire.
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    const bottomBuffer = (isMobile && isAndroid) ? 56 : 0;
     const pageHeight = isMobile
-      ? Math.max(200, carousel.clientHeight - bottomBuffer)
+      ? Math.max(200, carousel.clientHeight)
       : track.offsetHeight;
 
     if (isMobile) {
-      track.style.cssText = `display:flex;height:${pageHeight}px;width:max-content;overflow:visible;`;
+      track.style.cssText = `display:flex;flex-direction:column;height:auto;overflow:visible;`;
     }
 
     const tempDiv = document.createElement('div');
@@ -253,7 +250,7 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
       p.insertAdjacentHTML('beforeend', chapter.content);
       totalPages = 1; currentPage = 1;
       updateProgress(); scrollPage(1, true);
-      if (isMobile) _attachMobileScroll(pageWidth);
+      if (isMobile) _attachMobileScroll(pageHeight);
       return;
     }
 
@@ -325,31 +322,24 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     updateProgress();
     scrollPage(Math.min(restorePage, totalPages || 1), true);
 
-    if (isMobile) _attachMobileScroll(pageWidth);
+    if (isMobile) _attachMobileScroll(pageHeight);
   }
 
-  function _attachMobileScroll(pageWidth) {
-    // Snap programmatique + mise à jour de la progression
-    let snapTimer;
+  function _attachMobileScroll(pageHeight) {
+    // Le snap est géré nativement par CSS scroll-snap-type: y mandatory.
+    // On écoute uniquement pour mettre à jour la progression.
     mobileScrollHandler = () => {
-      currentPage = Math.round(carousel.scrollLeft / pageWidth) + 1;
+      currentPage = Math.round(carousel.scrollTop / pageHeight) + 1;
       updateProgress();
-      clearTimeout(snapTimer);
-      snapTimer = setTimeout(() => {
-        const target = Math.round(carousel.scrollLeft / pageWidth) * pageWidth;
-        if (Math.abs(carousel.scrollLeft - target) > 2) {
-          carousel.scrollTo({ left: target, behavior: 'smooth' });
-        }
-      }, 80);
     };
     carousel.addEventListener('scroll', mobileScrollHandler, { passive: true });
 
-    // Hint swipe : montrer une seule fois par session
-    if (!sessionStorage.getItem('swipeHintShown')) {
-      sessionStorage.setItem('swipeHintShown', '1');
+    // Hint scroll : montrer une seule fois par session
+    if (!sessionStorage.getItem('scrollHintShown')) {
+      sessionStorage.setItem('scrollHintShown', '1');
       const hint = document.createElement('div');
       hint.className = 'swipe-hint';
-      hint.textContent = '← Glisser pour tourner les pages →';
+      hint.textContent = '↑ Glisser pour tourner les pages ↓';
       overlay.appendChild(hint);
       setTimeout(() => hint.remove(), 3100);
     }
@@ -373,8 +363,13 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
   function scrollPage(pageNum, instant = false) {
     if (pageNum < 1 || pageNum > totalPages) return;
     currentPage = pageNum;
-    const sc = window.innerWidth <= 768 ? carousel : track;
-    sc.scrollTo({ left: (pageNum - 1) * sc.offsetWidth, behavior: instant ? 'instant' : 'smooth' });
+    if (window.innerWidth <= 768) {
+      // Mobile : scroll vertical, chaque page = hauteur du carousel
+      carousel.scrollTo({ top: (pageNum - 1) * carousel.clientHeight, behavior: instant ? 'instant' : 'smooth' });
+    } else {
+      // Desktop : scroll horizontal
+      track.scrollTo({ left: (pageNum - 1) * track.offsetWidth, behavior: instant ? 'instant' : 'smooth' });
+    }
     updateProgress();
   }
 
