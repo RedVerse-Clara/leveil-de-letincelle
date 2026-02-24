@@ -692,7 +692,7 @@ h2::after {
     min-height: 44px;
   }
 
-  /* Progress indicator — numéro + barre pleine largeur en bas */
+  /* Progress indicator — barre pleine largeur en bas + flèche discrète */
   .reader-progress-container {
     position: fixed;
     bottom: 0;
@@ -709,15 +709,20 @@ h2::after {
     z-index: 2002;
   }
 
-  .reader-progress-text {
+  .reader-progress-container::before {
+    content: '⌄';
     display: block;
     width: 100%;
-    text-align: right;
-    font-size: 0.65rem;
-    font-weight: 400;
-    color: rgba(255, 255, 255, 0.3);
-    padding: 0 0.6rem 0.2rem;
-    min-width: auto;
+    text-align: center;
+    font-size: 1rem;
+    line-height: 1;
+    color: rgba(255, 255, 255, 0.2);
+    margin-bottom: 0.15rem;
+    animation: arrowBounce 2s ease-in-out infinite;
+  }
+
+  .reader-progress-text {
+    display: none;
   }
 
   .reader-progress-bar {
@@ -1509,10 +1514,15 @@ h2::after {
     font-size: 1.05rem;
     line-height: 2.05;
     overflow-y: auto;
+    scrollbar-width: none;
     opacity: 0;
     transform: translateY(14px);
     pointer-events: none;
     transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .chapter-page::-webkit-scrollbar {
+    display: none;
   }
 
   .chapter-page--active {
@@ -1607,6 +1617,11 @@ h2::after {
   15%  { opacity: 1; }
   75%  { opacity: 1; }
   100% { opacity: 0; }
+}
+
+@keyframes arrowBounce {
+  0%, 100% { transform: translateY(0);   opacity: 0.2; }
+  50%       { transform: translateY(4px); opacity: 0.4; }
 }
 
 
