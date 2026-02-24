@@ -215,8 +215,10 @@ function attachReaderEvents(overlay, chapter, nextChapter = null) {
     // Sur mobile : visualViewport.height exclut l'URL bar et la barre de gestes Android,
     // garantissant que le padding-bottom de sécurité reste toujours visible à l'écran.
     const pageWidth = isMobile ? carousel.offsetWidth : track.offsetWidth;
+    // carousel.clientHeight = hauteur CSS réelle (top:60px → bottom:0), toujours
+    // synchronisée avec le rendu visuel quelle que soit la densité de l'écran.
     const pageHeight = isMobile
-      ? Math.max(200, (window.visualViewport?.height ?? window.innerHeight) - 60)
+      ? Math.max(200, carousel.clientHeight)
       : track.offsetHeight;
 
     if (isMobile) {
