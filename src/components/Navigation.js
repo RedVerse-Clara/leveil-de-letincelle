@@ -4,12 +4,12 @@ export function renderNavigation() {
     <nav id="main-nav" class="navigation">
       <div class="nav-container">
         <a href="#" class="nav-logo" data-scroll="home">L'Éveil de l'Étincelle</a>
-        
+
         <div class="nav-links desktop-only">
           <a href="#home" class="nav-link active" data-scroll="home">Accueil</a>
-          <a href="#presentation" class="nav-link" data-scroll="presentation">Présentation</a>
-          <a href="#chapters" class="nav-link" data-scroll="chapters">Derniers Chapitres</a>
-          <a href="#about" class="nav-link" data-scroll="about">À propos</a>
+          <a href="#chapters" class="nav-link" data-scroll="chapters">Chapitres</a>
+          <a href="#contribute" class="nav-link" data-scroll="contribute">Contribuer</a>
+          <a href="#support" class="nav-link" data-scroll="support">Soutenir</a>
         </div>
 
         <button class="mobile-menu-toggle" aria-label="Toggle menu">
@@ -17,10 +17,10 @@ export function renderNavigation() {
         </button>
 
         <div class="mobile-menu">
-           <a href="#home" class="mobile-nav-link active" data-scroll="home">Accueil</a>
-          <a href="#presentation" class="mobile-nav-link" data-scroll="presentation">Présentation</a>
-          <a href="#chapters" class="mobile-nav-link" data-scroll="chapters">Derniers Chapitres</a>
-          <a href="#about" class="mobile-nav-link" data-scroll="about">À propos</a>
+          <a href="#home" class="mobile-nav-link active" data-scroll="home">Accueil</a>
+          <a href="#chapters" class="mobile-nav-link" data-scroll="chapters">Chapitres</a>
+          <a href="#contribute" class="mobile-nav-link" data-scroll="contribute">Contribuer</a>
+          <a href="#support" class="mobile-nav-link" data-scroll="support">Soutenir</a>
         </div>
       </div>
       <div class="scroll-progress-container">
@@ -52,16 +52,24 @@ export function initNavigation() {
         const scrolled = (winScroll / height) * 100;
         if (progressBar) progressBar.style.width = scrolled + "%";
 
-        // Active Section
-        const sections = ['home', 'presentation', 'chapters', 'about'];
+        // Active Section — map intermediate sections to their nearest nav target
+        const sectionToNav = {
+            'home': 'home',
+            'how-it-works': 'home',
+            'synopsis': 'home',
+            'chapters': 'chapters',
+            'contribute': 'contribute',
+            'support': 'support'
+        };
+        const allSections = Object.keys(sectionToNav);
         let current = '';
 
-        sections.forEach(section => {
+        allSections.forEach(section => {
             const element = document.getElementById(section);
             if (element) {
                 const rect = element.getBoundingClientRect();
                 if (rect.top <= 150 && rect.bottom >= 150) {
-                    current = section;
+                    current = sectionToNav[section];
                 }
             }
         });

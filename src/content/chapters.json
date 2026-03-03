@@ -20,6 +20,40 @@
         ],
         "stripeLink": "https://buy.stripe.com/6oU6oG7aNdn76E23UX1ZS0I"
     },
+    "homepage": {
+        "heroSubtitle": "Un roman fantasy écrit chapitre après chapitre. Et toi, tu peux influencer la suite.",
+        "howItWorks": [
+            {
+                "icon": "book",
+                "title": "Je lis les chapitres",
+                "text": "Le roman se construit chapitre après chapitre, publié ici au fur et à mesure."
+            },
+            {
+                "icon": "lightbulb",
+                "title": "Je propose des idées",
+                "text": "À la fin de chaque chapitre, tu peux soumettre une idée pour influencer la suite. Les meilleures sont intégrées à l'histoire."
+            },
+            {
+                "icon": "heart",
+                "title": "Je soutiens l'écriture",
+                "text": "Si le projet te touche, tu peux contribuer financièrement pour aider Marc à continuer d'écrire."
+            }
+        ],
+        "synopsis": "Dans un monde où la magie est une rareté synonyme de danger, Hilyesin mène une vie de conscrit rythmée par l'entraînement et l'attente. Mais quand il découvre les ruines fumantes de son village natal, anéanti par une force prédatrice, il comprend que sa fiancée Maléna n'a pas péri ; elle a été enlevée. Armé d'un don électrique qu'il ne maîtrise pas et d'une détermination forgée dans les cendres, il se lance sur la piste d'un ennemi dont l'identité reste enveloppée de mystère.",
+        "synopsisHook": "Mais ce pouvoir a un prix. Et quelqu'un le sait déjà.",
+        "participation": {
+            "title": "Et si tu écrivais la suite ?",
+            "text": "Le prochain chapitre est en cours d'écriture. Tu peux proposer une idée, un personnage, un rebondissement. Marc lit tout. Les meilleures suggestions nourrissent l'histoire."
+        },
+        "support": {
+            "title": "Soutenir l'écriture",
+            "text": "Ce projet est entièrement indépendant. Chaque contribution, même symbolique, aide Marc à consacrer du temps à l'écriture des prochains chapitres.",
+            "ctaText": "Soutenir le projet"
+        },
+        "footer": {
+            "email": "marcassi79@gmail.com"
+        }
+    },
     "chapters": [
         {
             "id": "chapter-1",

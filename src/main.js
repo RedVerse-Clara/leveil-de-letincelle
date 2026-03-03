@@ -2,11 +2,15 @@ import './style.css';
 import { createAshParticles } from './utils/particles.js';
 import { renderNavigation, initNavigation } from './components/Navigation.js';
 import { renderHero } from './components/Hero.js';
-import { renderPresentation } from './components/Presentation.js';
+import { renderHowItWorks } from './components/HowItWorks.js';
+import { renderSynopsis } from './components/Synopsis.js';
 import { renderChapterCard } from './components/ChapterCard.js';
+import { renderParticipation } from './components/Participation.js';
+import { renderSupport } from './components/Support.js';
+import { renderFooter } from './components/Footer.js';
 import { renderChapterReader } from './components/ChapterReader.js';
 import chaptersData from './content/chapters.json';
-import { updateSEO } from './utils/seo.js'; // Import SEO manager
+import { updateSEO } from './utils/seo.js';
 
 // CUSDIS COMMENTS LOADER
 // We construct the element dynamically when a chapter is opened
@@ -16,20 +20,23 @@ function loadComments(chapterId, title) {
   const container = document.getElementById('comments-container');
   if (!container) return;
 
-  container.innerHTML = ''; // Clear placeholder
+  // Hide homepage cusdis thread to avoid ID conflict with querySelector('#cusdis_thread')
+  const homepageThread = document.querySelector('#participation-cusdis-container #cusdis_thread');
+  if (homepageThread) homepageThread.id = 'cusdis_thread_homepage';
+
+  container.innerHTML = '';
 
   const div = document.createElement('div');
   div.id = 'cusdis_thread';
   div.dataset.host = 'https://cusdis.com';
   div.dataset.appId = CUSDIS_APP_ID;
   div.dataset.pageId = chapterId;
-  div.dataset.pageUrl = window.location.href; // Simplified URL
+  div.dataset.pageUrl = window.location.href;
   div.dataset.pageTitle = title;
   div.dataset.theme = 'dark';
 
   container.appendChild(div);
 
-  // Load script if needed
   if (!document.getElementById('cusdis-script')) {
     const script = document.createElement('script');
     script.id = 'cusdis-script';
@@ -69,60 +76,52 @@ window.addEventListener('message', (e) => {
 const app = document.querySelector('#app');
 
 function renderApp() {
-  // Update SEO for Home
   updateSEO('home');
 
-  const chaptersHTML = chaptersData.chapters.map(c => renderChapterCard(c)).join('');
+  const homepage = chaptersData.homepage;
+  const stripeLink = chaptersData.presentation.stripeLink;
+  const lastIndex = chaptersData.chapters.length - 1;
+  const chaptersHTML = chaptersData.chapters
+    .map((c, i) => renderChapterCard(c, i === lastIndex))
+    .join('');
 
   app.innerHTML = `
     ${renderNavigation()}
-    
+
     <div id="content-wrapper">
       <main>
         ${renderHero(chaptersData)}
-        
-        ${renderPresentation(chaptersData.presentation)}
-        
+        ${renderHowItWorks(homepage.howItWorks)}
+        ${renderSynopsis(homepage.synopsis, homepage.synopsisHook)}
+
         <section id="chapters" class="section chapters-section">
           <div class="container">
-            <h2 class="section-title">Derniers Chapitres</h2>
+            <h2 class="section-title">Chapitres publiés</h2>
             <div class="chapters-grid">
               ${chaptersHTML}
             </div>
           </div>
         </section>
 
-        <section id="about" class="section about-section">
-          <div class="container">
-            <h2 class="section-title">À Propos</h2>
-            <div class="glass-card">
-              <p>L'Éveil de l'Étincelle est une épopée fantaisie écrite avec passion. Suivez-moi pour découvrir la suite des aventures d'Hilyésin.</p>
-              <p style="margin-top: 1rem; font-weight: 600; font-family: 'Cinzel', serif;">Marc ASSI</p>
-              <p style="margin-top: 1rem; opacity: 0.7;">© 2026 L'Éveil de l'Étincelle. Tous droits réservés.</p>
-            </div>
-          </div>
-        </section>
+        ${renderParticipation(homepage.participation)}
+        ${renderSupport(homepage.support, stripeLink)}
       </main>
 
-      <footer class="main-footer">
-        <div class="container">
-          <p>Site réalisé avec passion pour L'Éveil de l'Étincelle</p>
-        </div>
-      </footer>
+      ${renderFooter(homepage.footer)}
     </div>
-    
+
     <!-- Reader Overlay Container -->
     <div id="reader-container"></div>
   `;
 
-  // Initialize interactive elements
   initNavigation();
   createAshParticles('bg-canvas');
   initChapterButtons();
+  initReadChapterLinks();
+  loadParticipationComments();
 }
 
 function initChapterButtons() {
-  // Use event delegation on the chapters-grid container for better performance and to handle dynamic content if needed
   const grid = document.querySelector('.chapters-grid');
   if (grid) {
     grid.addEventListener('click', (e) => {
@@ -135,6 +134,54 @@ function initChapterButtons() {
         }
       }
     });
+  }
+}
+
+function initReadChapterLinks() {
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('.read-chapter-link');
+    if (link) {
+      e.preventDefault();
+      const chapterId = link.getAttribute('data-chapter');
+      if (chapterId) {
+        openChapter(chapterId);
+      }
+    }
+  });
+}
+
+function loadParticipationComments() {
+  const container = document.getElementById('participation-cusdis-container');
+  if (!container) return;
+
+  const div = document.createElement('div');
+  div.id = 'cusdis_thread';
+  div.dataset.host = 'https://cusdis.com';
+  div.dataset.appId = CUSDIS_APP_ID;
+  div.dataset.pageId = 'ideas';
+  div.dataset.pageUrl = window.location.origin;
+  div.dataset.pageTitle = "Proposer une idée — L'Éveil de l'Étincelle";
+  div.dataset.theme = 'dark';
+
+  container.appendChild(div);
+
+  if (!document.getElementById('cusdis-script')) {
+    const script = document.createElement('script');
+    script.id = 'cusdis-script';
+    script.src = 'https://cusdis.com/js/cusdis.es.js';
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+  } else if (window.CUSDIS) {
+    window.CUSDIS.initial();
+  }
+
+  const noticeContainer = document.getElementById('participation-moderation-notice');
+  if (noticeContainer) {
+    const notice = document.createElement('p');
+    notice.style.cssText = "color: var(--text-secondary); font-size: 0.85rem; opacity: 0.8; margin-top: 1rem;";
+    notice.innerText = "Note : Les commentaires sont soumis à validation avant d'apparaître.";
+    noticeContainer.appendChild(notice);
   }
 }
 
@@ -480,7 +527,10 @@ function closeReader() {
     overlay.classList.remove('active');
     setTimeout(() => {
       readerContainer.innerHTML = '';
-      document.body.style.overflow = ''; // Re-enable scroll on body
+      document.body.style.overflow = '';
+      // Restore homepage cusdis thread ID
+      const homepageThread = document.getElementById('cusdis_thread_homepage');
+      if (homepageThread) homepageThread.id = 'cusdis_thread';
     }, 300);
   }
 }
