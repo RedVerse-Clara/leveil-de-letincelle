@@ -2119,6 +2119,13 @@ h2::after {
    ========================================= */
 @media (max-width: 768px) {
 
+  /* Hero: min-height instead of fixed height so content fits */
+  .hero-section {
+    height: auto;
+    min-height: 100vh;
+    padding-bottom: 2rem;
+  }
+
   /* Hero tagline */
   .hero-tagline {
     font-size: 1rem;
