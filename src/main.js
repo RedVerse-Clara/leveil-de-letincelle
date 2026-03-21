@@ -1,83 +1,19 @@
-import './style.css';
-import { createAshParticles } from './utils/particles.js';
-import { renderNavigation, initNavigation } from './components/Navigation.js';
+import { renderSiteNavigation, renderSiteFooter, initSharedPage, chaptersData } from './shared.js';
 import { renderHero } from './components/Hero.js';
 import { renderHowItWorks } from './components/HowItWorks.js';
 import { renderSynopsis } from './components/Synopsis.js';
 import { renderChapterCard } from './components/ChapterCard.js';
-import { renderParticipation } from './components/Participation.js';
 import { renderSupport } from './components/Support.js';
-import { renderFooter } from './components/Footer.js';
-import { renderChapterReader } from './components/ChapterReader.js';
-import chaptersData from './content/chapters.json';
-import { updateSEO } from './utils/seo.js';
 
-// CUSDIS COMMENTS LOADER
-// We construct the element dynamically when a chapter is opened
-const CUSDIS_APP_ID = "f4c40187-515a-4943-a0c6-f498019a4115";
-
-function loadComments(chapterId, title) {
-  const container = document.getElementById('comments-container');
-  if (!container) return;
-
-  // Hide homepage cusdis thread to avoid ID conflict with querySelector('#cusdis_thread')
-  const homepageThread = document.querySelector('#participation-cusdis-container #cusdis_thread');
-  if (homepageThread) homepageThread.id = 'cusdis_thread_homepage';
-
-  container.innerHTML = '';
-
-  const div = document.createElement('div');
-  div.id = 'cusdis_thread';
-  div.dataset.host = 'https://cusdis.com';
-  div.dataset.appId = CUSDIS_APP_ID;
-  div.dataset.pageId = chapterId;
-  div.dataset.pageUrl = window.location.href;
-  div.dataset.pageTitle = title;
-  div.dataset.theme = 'dark';
-
-  container.appendChild(div);
-
-  if (!document.getElementById('cusdis-script')) {
-    const script = document.createElement('script');
-    script.id = 'cusdis-script';
-    script.src = 'https://cusdis.com/js/cusdis.es.js';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
-  } else if (window.CUSDIS) {
-    window.CUSDIS.initial();
-  }
-
-  // Add moderation notice in separate container (always visible, outside scrollable area)
-  const noticeContainer = document.getElementById('moderation-notice-container');
-  if (noticeContainer) {
-    const notice = document.createElement('p');
-    notice.style.cssText = "color: var(--text-secondary); font-size: 0.85rem; opacity: 0.8; margin: 0;";
-    notice.innerText = "Note : Les commentaires sont soumis à validation avant d'apparaître.";
-    noticeContainer.innerHTML = '';
-    noticeContainer.appendChild(notice);
-  }
-
-  // Le bouton de soutien est rendu statiquement dans le template ChapterReader
-}
-
-// Global Listener to try and catch post success if emitted
-window.addEventListener('message', (e) => {
-  if (e.data && e.data.from === 'cusdis') {
-    // If we ever get a specific success event, we can enhance this.
-    // For now, the visual refresh of the iframe is the main cue.
-  }
-});
-
-// ============================================
-// MAIN APP LOGIC
-// ============================================
+// Map chapter IDs to URL slugs
+const CHAPTER_SLUGS = {
+  'chapter-1': 'les-cendres-de-pradwyn',
+  'chapter-2': 'lecho-sous-la-pierre',
+};
 
 const app = document.querySelector('#app');
 
 function renderApp() {
-  updateSEO('home');
-
   const homepage = chaptersData.homepage;
   const stripeLink = chaptersData.presentation.stripeLink;
   const lastIndex = chaptersData.chapters.length - 1;
@@ -86,7 +22,7 @@ function renderApp() {
     .join('');
 
   app.innerHTML = `
-    ${renderNavigation()}
+    ${renderSiteNavigation('home')}
 
     <div id="content-wrapper">
       <main>
@@ -94,7 +30,7 @@ function renderApp() {
         ${renderHowItWorks(homepage.howItWorks)}
         ${renderSynopsis(homepage.synopsis, homepage.synopsisHook)}
 
-        <section id="chapters" class="section chapters-section">
+        <section id="chapitres" class="section chapters-section">
           <div class="container">
             <h2 class="section-title">Chapitres publiés</h2>
             <div class="chapters-grid">
@@ -103,460 +39,93 @@ function renderApp() {
           </div>
         </section>
 
-        ${renderParticipation(homepage.participation)}
         ${renderSupport(homepage.support, stripeLink)}
       </main>
 
-      ${renderFooter(homepage.footer)}
+      ${renderSiteFooter()}
     </div>
-
-    <!-- Reader Overlay Container -->
-    <div id="reader-container"></div>
   `;
 
-  initNavigation();
-  createAshParticles('bg-canvas');
-  initChapterButtons();
-  initReadChapterLinks();
-  loadParticipationComments();
+  initSharedPage();
+  initHomepageScrollSpy();
+  initChapterLinks();
 }
 
-function initChapterButtons() {
-  const grid = document.querySelector('.chapters-grid');
-  if (grid) {
-    grid.addEventListener('click', (e) => {
-      const btn = e.target.closest('.read-chapter-btn');
-      if (btn) {
-        e.preventDefault();
-        const chapterId = btn.getAttribute('data-id');
-        if (chapterId) {
-          openChapter(chapterId);
+/**
+ * Scroll spy for homepage sections (highlight nav links).
+ */
+function initHomepageScrollSpy() {
+  const nav = document.getElementById('main-nav');
+  if (!nav) return;
+  const links = nav.querySelectorAll('.nav-link, .mobile-nav-link');
+
+  window.addEventListener('scroll', () => {
+    const sectionToNav = {
+      'home': 'home',
+      'how-it-works': 'home',
+      'synopsis': 'home',
+      'chapitres': 'chapters',
+      'support': 'home'
+    };
+
+    let current = 'home';
+    Object.keys(sectionToNav).forEach(section => {
+      const element = document.getElementById(section);
+      if (element) {
+        const rect = element.getBoundingClientRect();
+        if (rect.top <= 150 && rect.bottom >= 150) {
+          current = sectionToNav[section];
         }
       }
     });
-  }
+
+    links.forEach(link => {
+      const href = link.getAttribute('href');
+      // Only highlight home link via scroll spy
+      if (href === '/' || href === '/#chapitres') {
+        link.classList.toggle('active', current === 'home' && href === '/');
+      }
+    });
+  });
 }
 
-function initReadChapterLinks() {
+/**
+ * Intercept chapter card clicks and navigate to real URLs.
+ */
+function initChapterLinks() {
+  // Chapter card buttons
   document.addEventListener('click', (e) => {
+    const btn = e.target.closest('.read-chapter-btn');
+    if (btn) {
+      e.preventDefault();
+      const chapterId = btn.getAttribute('data-id');
+      const slug = CHAPTER_SLUGS[chapterId];
+      if (slug) {
+        window.location.href = `/chapitre/${slug}/`;
+      }
+    }
+
+    // "Commencer la lecture" and synopsis links
     const link = e.target.closest('.read-chapter-link');
     if (link) {
       e.preventDefault();
       const chapterId = link.getAttribute('data-chapter');
-      if (chapterId) {
-        openChapter(chapterId);
+      const slug = CHAPTER_SLUGS[chapterId];
+      if (slug) {
+        window.location.href = `/chapitre/${slug}/`;
       }
     }
   });
 }
 
-function loadParticipationComments() {
-  const container = document.getElementById('participation-cusdis-container');
-  if (!container) return;
-
-  const div = document.createElement('div');
-  div.id = 'cusdis_thread';
-  div.dataset.host = 'https://cusdis.com';
-  div.dataset.appId = CUSDIS_APP_ID;
-  div.dataset.pageId = 'ideas';
-  div.dataset.pageUrl = window.location.origin;
-  div.dataset.pageTitle = "Proposer une idée — L'Éveil de l'Étincelle";
-  div.dataset.theme = 'dark';
-
-  container.appendChild(div);
-
-  if (!document.getElementById('cusdis-script')) {
-    const script = document.createElement('script');
-    script.id = 'cusdis-script';
-    script.src = 'https://cusdis.com/js/cusdis.es.js';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
-  } else if (window.CUSDIS) {
-    window.CUSDIS.initial();
-  }
-
-  const noticeContainer = document.getElementById('participation-moderation-notice');
-  if (noticeContainer) {
-    const notice = document.createElement('p');
-    notice.style.cssText = "color: var(--text-secondary); font-size: 0.85rem; opacity: 0.8; margin-top: 1rem;";
-    notice.innerText = "Note : Les commentaires sont soumis à validation avant d'apparaître.";
-    noticeContainer.appendChild(notice);
+// Handle legacy hash URLs (redirect to new URLs)
+if (window.location.hash.startsWith('#chapter-')) {
+  const chapterId = window.location.hash.replace('#', '');
+  const slug = CHAPTER_SLUGS[chapterId];
+  if (slug) {
+    window.location.replace(`/chapitre/${slug}/`);
   }
 }
-
-// Chapter Reader Logic
-function openChapter(chapterId) {
-  const readerContainer = document.getElementById('reader-container');
-  const chapter = chaptersData.chapters.find(c => c.id === chapterId);
-
-  if (!chapter) {
-    console.error("Chapter not found:", chapterId);
-    return;
-  }
-
-  // Update SEO for Chapter
-  updateSEO('chapter', chapter);
-
-  const currentIndex = chaptersData.chapters.findIndex(c => c.id === chapterId);
-  const nextChapter = currentIndex < chaptersData.chapters.length - 1 ? chaptersData.chapters[currentIndex + 1] : null;
-
-  // Render the reader overlay
-  readerContainer.innerHTML = renderChapterReader(chapter, chaptersData.presentation.stripeLink);
-
-  // Initialize Comments for this chapter
-  loadComments(chapter.id, chapter.title);
-
-  // Update URL hash
-  history.pushState({ chapterId }, '', `#${chapterId}`);
-
-  // Show overlay with animation
-  const overlay = readerContainer.querySelector('.chapter-reader-overlay');
-
-  requestAnimationFrame(() => {
-    overlay.classList.add('active');
-  });
-
-  // Disable main scroll
-  document.body.style.overflow = 'hidden';
-
-  // Attach event listeners for the reader
-  attachReaderEvents(overlay, chapter, nextChapter);
-}
-
-function attachReaderEvents(overlay, chapter, nextChapter = null) {
-  const closeBtn = overlay.querySelector('.btn-close-reader');
-  const track = overlay.querySelector('.chapter-track');
-  const carousel = track.parentElement; // chapter-carousel
-  const progressBar = overlay.querySelector('.reader-progress-fill');
-  const progressText = overlay.querySelector('.reader-progress-text');
-
-  // Controls
-  const settingsBtn = overlay.querySelector('.btn-settings-reader');
-  const settingsPanel = overlay.querySelector('.settings-panel');
-  const fontChoiceBtns = overlay.querySelectorAll('.font-choice-btn');
-  const fontSizeBtns = overlay.querySelectorAll('.font-btn');
-  const prevPageBtn = overlay.querySelector('.nav-btn.prev');
-  const nextPageBtn = overlay.querySelector('.nav-btn.next');
-
-  let totalPages = 1;
-  let currentPage = 1;
-  let pageElements = [];
-  let touchStartX = 0;
-  let touchStartY = 0;
-
-  function createHorizontalPages(restorePage = 1) {
-    track.innerHTML = '';
-    pageElements = [];
-
-    const isMobile = window.innerWidth <= 768;
-
-    // Dimensions d'une page.
-    // Sur mobile, le carousel est position:fixed top:60px bottom:0.
-    // Les pages sont position:absolute height:100% — le clientHeight sert uniquement
-    // à l'algorithme de découpe (overflow check), pas au scroll.
-    const pageWidth = isMobile ? carousel.offsetWidth : track.offsetWidth;
-    const pageHeight = isMobile
-      ? Math.max(200, carousel.clientHeight)
-      : track.offsetHeight;
-
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = chapter.content;
-    const children = Array.from(tempDiv.children);
-
-    // Crée une nouvelle page et l'insère dans le track
-    function startPage(isFirst) {
-      const p = document.createElement('div');
-      p.className = isFirst ? 'chapter-page chapter-page--first' : 'chapter-page';
-      p.style.width  = `${pageWidth}px`;
-      p.style.height = `${pageHeight}px`;
-      if (isFirst) {
-        const h = document.createElement('h2');
-        h.className = 'chapter-page-title';
-        h.textContent = chapter.title;
-        p.appendChild(h);
-      }
-      track.appendChild(p);
-      pageElements.push(p);
-      return p;
-    }
-
-    if (!children.length) {
-      const p = startPage(true);
-      p.insertAdjacentHTML('beforeend', chapter.content);
-      totalPages = 1; currentPage = 1;
-      updateProgress(); scrollPage(1, true);
-      return;
-    }
-
-    // Coupe un paragraphe en deux pour remplir la page courante avant d'en commencer
-    // une nouvelle. Recherche binaire sur les mots pour trouver la coupure maximale
-    // qui ne provoque pas de débordement. Retourne { first, second } ou null.
-    function trySplitParagraph(para) {
-      const words = para.textContent.trim().split(/\s+/);
-      if (words.length < 5) return null;
-      const probe = para.cloneNode(false);
-      activePage.appendChild(probe);
-      let lo = 1, hi = words.length - 1, best = 0;
-      while (lo <= hi) {
-        const mid = (lo + hi) >> 1;
-        probe.textContent = words.slice(0, mid).join(' ');
-        if (activePage.scrollHeight <= activePage.clientHeight + 2) { best = mid; lo = mid + 1; }
-        else { hi = mid - 1; }
-      }
-      activePage.removeChild(probe);
-      if (best < 3) return null;
-      const first  = para.cloneNode(false); first.textContent  = words.slice(0, best).join(' ');
-      const second = para.cloneNode(false); second.textContent = words.slice(best).join(' ');
-      return { first, second };
-    }
-
-    let activePage = startPage(true);
-
-    for (const child of children) {
-      activePage.appendChild(child);
-
-      // Vérification du débordement réel dans le DOM
-      if (activePage.scrollHeight > activePage.clientHeight + 2) {
-        const titleOffset = pageElements.length === 1 ? 1 : 0;
-        const contentCount = activePage.children.length - titleOffset;
-
-        if (contentCount > 1) {
-          activePage.removeChild(child);
-          // Tenter un découpage mot à mot pour remplir la page courante
-          const split = child.tagName === 'P' ? trySplitParagraph(child) : null;
-          if (split) {
-            activePage.appendChild(split.first);
-            activePage = startPage(false);
-            activePage.appendChild(split.second);
-          } else {
-            activePage = startPage(false);
-            activePage.appendChild(child);
-          }
-        }
-        // Sinon : élément unique trop grand → on l'accepte tel quel
-      }
-    }
-
-    // Page dédiée pour le CTA "Chapitre suivant" — jamais tronquée
-    if (nextChapter) {
-      const endPage = startPage(false);
-      endPage.classList.add('chapter-page--end');
-      endPage.innerHTML = `
-        <div class="chapter-end-cta">
-          <p class="chapter-end-label">Fin du chapitre</p>
-          <button class="btn btn-nav-chapter chapter-end-btn" data-id="${nextChapter.id}">
-            ${nextChapter.title} →
-          </button>
-        </div>
-      `;
-    }
-
-    totalPages = pageElements.length || 1;
-    currentPage = 1;
-    updateProgress();
-    scrollPage(Math.min(restorePage, totalPages || 1), true);
-  }
-
-  // Mettre à jour la progression
-  function updateProgress() {
-    if (totalPages === 0) return;
-    
-    progressText.textContent = `${currentPage} / ${totalPages}`;
-    
-    const scrollPercent = totalPages > 1 ? ((currentPage - 1) / (totalPages - 1)) * 100 : 100;
-    progressBar.style.width = `${scrollPercent}%`;
-    
-    // Mettre à jour les boutons de navigation
-    prevPageBtn.disabled = currentPage === 1;
-    nextPageBtn.disabled = currentPage === totalPages;
-  }
-
-  // Naviguer vers une page spécifique
-  function scrollPage(pageNum, instant = false) {
-    if (pageNum < 1 || pageNum > totalPages) return;
-    currentPage = pageNum;
-    if (window.innerWidth <= 768) {
-      // Mobile : affichage par classe CSS — zéro scroll, zéro snap, zéro calcul de hauteur
-      pageElements.forEach((p, i) => {
-        p.classList.toggle('chapter-page--active', i === pageNum - 1);
-      });
-    } else {
-      // Desktop : scroll horizontal
-      track.scrollTo({ left: (pageNum - 1) * track.offsetWidth, behavior: instant ? 'instant' : 'smooth' });
-    }
-    updateProgress();
-  }
-
-  // Naviguer à la page suivante/précédente
-  function goToPage(dir) {
-    const newPage = currentPage + dir;
-    if (newPage >= 1 && newPage <= totalPages) {
-      scrollPage(newPage);
-    }
-  }
-
-  // Touch Events — swipe vertical sur mobile, horizontal sur desktop
-  const handleTouchStart = (e) => {
-    touchStartX = e.changedTouches[0].screenX;
-    touchStartY = e.changedTouches[0].screenY;
-  };
-
-  const handleTouchEnd = (e) => {
-    // Mobile : navigation par boutons ↑/↓, pas par swipe (évite les changements accidentels)
-    if (window.innerWidth > 768) {
-      const dx = e.changedTouches[0].screenX - touchStartX;
-      if (dx < -50) goToPage(1);   // Swipe gauche → page suivante
-      if (dx > 50)  goToPage(-1);  // Swipe droite → page précédente
-    }
-  };
-
-  // Event Listeners
-  prevPageBtn.addEventListener('click', () => goToPage(-1));
-  nextPageBtn.addEventListener('click', () => goToPage(1));
-
-  // Keyboard Navigation
-  const handleKeydown = (e) => {
-    if (e.key === 'ArrowLeft') goToPage(-1);
-    if (e.key === 'ArrowRight') goToPage(1);
-    if (e.key === 'Escape') closeReader();
-  };
-  window.addEventListener('keydown', handleKeydown);
-
-  // Touch Events — carousel couvre mobile (pages abs) et desktop (track scroll)
-  carousel.addEventListener('touchstart', handleTouchStart, { passive: true });
-  carousel.addEventListener('touchend', handleTouchEnd);
-
-  // Close Reader
-  closeBtn.addEventListener('click', () => {
-    window.removeEventListener('keydown', handleKeydown);
-    closeReader();
-    history.pushState(null, '', window.location.pathname);
-  });
-
-  // Settings Panel
-  settingsBtn.addEventListener('click', (e) => {
-    e.stopPropagation();
-    settingsPanel.classList.toggle('active');
-  });
-
-  overlay.addEventListener('click', (e) => {
-    if (!settingsPanel.contains(e.target) && e.target !== settingsBtn) {
-      settingsPanel.classList.remove('active');
-    }
-  });
-
-  // Font Choice
-  fontChoiceBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const font = btn.getAttribute('data-font');
-      overlay.setAttribute('data-font', font);
-      fontChoiceBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      // Recréer les pages avec la nouvelle police
-      setTimeout(createHorizontalPages, 100);
-    });
-  });
-
-  // Font Size
-  fontSizeBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const size = btn.getAttribute('data-size');
-      overlay.setAttribute('data-font-size', size);
-      fontSizeBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      
-      // Recréer les pages avec la nouvelle taille
-      setTimeout(createHorizontalPages, 100);
-    });
-  });
-
-  // Panneau commentaires
-  const commentsBtn = overlay.querySelector('.btn-comments-reader');
-  const sidebar = overlay.querySelector('.reader-sidebar');
-  const closeCommentsBtn = overlay.querySelector('.btn-close-comments');
-  if (commentsBtn && sidebar) {
-    commentsBtn.addEventListener('click', () => sidebar.classList.toggle('active'));
-    closeCommentsBtn?.addEventListener('click', () => sidebar.classList.remove('active'));
-  }
-
-  // Navigation entre les chapitres — délégation pour couvrir le CTA dynamique
-  track.addEventListener('click', (e) => {
-    const navBtn = e.target.closest('.btn-nav-chapter');
-    if (navBtn) {
-      window.removeEventListener('keydown', handleKeydown);
-      const nextId = navBtn.getAttribute('data-id');
-      closeReader();
-      setTimeout(() => openChapter(nextId), 300);
-    }
-  });
-
-  // Initialiser les pages une fois Merriweather effectivement rendue
-  // document.fonts.ready peut résoudre avant le chargement lazy du overlay —
-  // on force explicitement le chargement de Merriweather avant de mesurer.
-  const handleResize = () => { createHorizontalPages(currentPage); };
-
-  // On charge la police principale ; .catch() garantit que les pages sont
-  // créées même si la police ne peut pas être chargée (réseau, cache, etc.)
-  document.fonts.load('1rem "Merriweather"')
-    .catch(() => {})
-    .then(() => {
-      createHorizontalPages();
-      window.addEventListener('resize', handleResize);
-      // Recalculer aussi quand l'URL bar apparaît/disparaît sur mobile
-      if (window.visualViewport) window.visualViewport.addEventListener('resize', handleResize);
-    });
-
-  overlay.addEventListener('close-reader', () => {
-    window.removeEventListener('resize', handleResize);
-    window.removeEventListener('keydown', handleKeydown);
-    if (window.visualViewport) window.visualViewport.removeEventListener('resize', handleResize);
-  }, { once: true });
-}
-
-function closeReader() {
-  const overlay = document.querySelector('.chapter-reader-overlay');
-  const readerContainer = document.getElementById('reader-container');
-
-  // Revert SEO to Home
-  updateSEO('home');
-
-  if (overlay) {
-    overlay.dispatchEvent(new CustomEvent('close-reader'));
-    overlay.classList.remove('active');
-    setTimeout(() => {
-      readerContainer.innerHTML = '';
-      document.body.style.overflow = '';
-      // Restore homepage cusdis thread ID
-      const homepageThread = document.getElementById('cusdis_thread_homepage');
-      if (homepageThread) homepageThread.id = 'cusdis_thread';
-    }, 300);
-  }
-}
-
-// Handle Browser Back Button
-window.addEventListener('popstate', () => {
-  // If we are back to root or non-chapter hash, close reader
-  if (!window.location.hash.includes('chapter-')) {
-    closeReader();
-  } else {
-    // If we are navigating TO a chapter via history (forward/back)
-    const hash = window.location.hash.replace('#', '');
-    if (hash.startsWith('chapter-')) {
-      openChapter(hash); // This might recurse if not careful, but openChapter handles ID checks
-    }
-  }
-});
-
-// Handle initial load with hash
-window.addEventListener('DOMContentLoaded', () => {
-  if (window.location.hash.startsWith('#chapter-')) {
-    const chapterId = window.location.hash.replace('#', '');
-    // Small delay to ensure data is loaded/rendered
-    setTimeout(() => openChapter(chapterId), 100);
-  }
-});
 
 // Start the app
 renderApp();

@@ -4,36 +4,50 @@
   <!-- Homepage -->
   <url>
     <loc>https://www.leveildeletincelle.fr/</loc>
-    <lastmod>2026-02-24</lastmod>
+    <lastmod>2026-03-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
       <image:loc>https://www.leveildeletincelle.fr/images/logo.jpg</image:loc>
-      <image:title>L'Éveil de l'Étincelle - Roman Fantasy</image:title>
+      <image:title>L'Éveil de l'Étincelle - Roman Fantasy Épique</image:title>
     </image:image>
   </url>
-  <!-- Chapters -->
-  
+
+  <!-- Chapters (real URLs) -->
   <url>
-    <loc>https://www.leveildeletincelle.fr/#chapter-1</loc>
-    <lastmod>2026-02-24</lastmod>
+    <loc>https://www.leveildeletincelle.fr/chapitre/les-cendres-de-pradwyn/</loc>
+    <lastmod>2026-03-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
-      <image:loc>https://www.leveildeletincelle.fr/images/logo.jpg</image:loc>
+      <image:loc>https://www.leveildeletincelle.fr/images/chapter-1.jpg</image:loc>
       <image:title>Chapitre 1 : Les Cendres de Pradwyn - L'Éveil de l'Étincelle</image:title>
     </image:image>
   </url>
-  
   <url>
-    <loc>https://www.leveildeletincelle.fr/#chapter-2</loc>
-    <lastmod>2026-02-24</lastmod>
+    <loc>https://www.leveildeletincelle.fr/chapitre/lecho-sous-la-pierre/</loc>
+    <lastmod>2026-03-21</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
-      <image:loc>https://www.leveildeletincelle.fr/images/logo.jpg</image:loc>
+      <image:loc>https://www.leveildeletincelle.fr/images/chapter-2.jpg</image:loc>
       <image:title>Chapitre 2 : L'Écho sous la Pierre - L'Éveil de l'Étincelle</image:title>
     </image:image>
   </url>
-  
+
+  <!-- Univers -->
+  <url>
+    <loc>https://www.leveildeletincelle.fr/univers/</loc>
+    <lastmod>2026-03-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Blog -->
+  <url>
+    <loc>https://www.leveildeletincelle.fr/blog/</loc>
+    <lastmod>2026-03-21</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
 </urlset>

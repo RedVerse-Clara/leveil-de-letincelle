@@ -1,34 +1,19 @@
 
 export function renderHero(chaptersData) {
-  const totalChapters = 40;
-  const writtenChapters = chaptersData?.chapters?.length || 0;
-  const progressPercent = Math.round((writtenChapters / totalChapters) * 100);
-  const heroSubtitle = chaptersData?.homepage?.heroSubtitle || '';
-
   return `
     <section id="home" class="hero-section">
       <div class="hero-content">
         <div class="hero-logo-container">
-          <img src="images/logo.jpg" alt="Logo L'Éveil de l'Étincelle" class="hero-logo">
-          <img src="images/hilyesin_medite.png" alt="Hilyésin médite" class="hero-illustration">
+          <img src="/images/logo.jpg" alt="Logo L'Éveil de l'Étincelle" class="hero-logo">
+          <img src="/images/hilyesin_medite.png" alt="Hilyésin médite" class="hero-illustration">
         </div>
         <h1 class="hero-title">L'Éveil de l'Étincelle</h1>
         <h2 class="hero-subtitle electric-text">Tome 1 : Les Cendres</h2>
-        <p class="hero-tagline">${heroSubtitle}</p>
-
-        <div class="writing-progress-container">
-          <div class="writing-progress-info">
-            <span class="progress-label">Progression d'écriture</span>
-            <span class="progress-stats">${writtenChapters} / ${totalChapters} chapitres (${progressPercent}%)</span>
-          </div>
-          <div class="writing-progress-bar">
-            <div class="writing-progress-fill" style="width: ${progressPercent}%"></div>
-          </div>
-        </div>
+        <p class="hero-tagline">Un roman de dark fantasy où la magie consume ceux qui l'utilisent.</p>
 
         <div class="hero-cta-container">
-          <a href="#" class="btn btn-large btn-glow read-chapter-link" data-chapter="chapter-1">
-            Commencer la lecture →
+          <a href="/chapitre/les-cendres-de-pradwyn/" class="btn btn-large btn-glow">
+            Lire le premier chapitre →
           </a>
         </div>
       </div>

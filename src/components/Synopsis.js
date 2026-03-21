@@ -7,7 +7,7 @@ export function renderSynopsis(synopsisText, synopsisHook) {
         <div class="synopsis-content glass-card">
           <p class="synopsis-text">${synopsisText}</p>
           <p class="synopsis-hook">${synopsisHook}</p>
-          <a href="#" class="synopsis-cta read-chapter-link" data-chapter="chapter-1">
+          <a href="/chapitre/les-cendres-de-pradwyn/" class="synopsis-cta">
             → Commencer la lecture
           </a>
         </div>

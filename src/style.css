@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap');
+
 :root {
   /* Colors */
   --bg-dark: #080808;
@@ -1107,9 +1109,6 @@ h2::after {
   font-size: 0.9rem;
   padding: 0.6rem 1.2rem;
 }
-
-/* Add Merriweather font for reading */
-@import url('https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,400&display=swap');
 
 
 /* =========================================

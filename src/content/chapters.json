@@ -21,22 +21,22 @@
         "stripeLink": "https://buy.stripe.com/6oU6oG7aNdn76E23UX1ZS0I"
     },
     "homepage": {
-        "heroSubtitle": "Un roman fantasy écrit chapitre après chapitre. Et toi, tu peux influencer la suite.",
+        "heroSubtitle": "Un roman de dark fantasy où la magie consume ceux qui l'utilisent.",
         "howItWorks": [
             {
                 "icon": "book",
-                "title": "Je lis les chapitres",
-                "text": "Le roman se construit chapitre après chapitre, publié ici au fur et à mesure."
+                "title": "Lisez les premiers chapitres",
+                "text": "Découvrez gratuitement le début de l'histoire. Plongez dans un monde où la magie est rare et dangereuse."
             },
             {
-                "icon": "lightbulb",
-                "title": "Je propose des idées",
-                "text": "À la fin de chaque chapitre, tu peux soumettre une idée pour influencer la suite. Les meilleures sont intégrées à l'histoire."
+                "icon": "globe",
+                "title": "Explorez l'univers",
+                "text": "Personnages, système de magie, lieux : découvrez le worldbuilding derrière le roman."
             },
             {
                 "icon": "heart",
-                "title": "Je soutiens l'écriture",
-                "text": "Si le projet te touche, tu peux contribuer financièrement pour aider Marc à continuer d'écrire."
+                "title": "Soutenez le projet",
+                "text": "Ce roman est écrit de façon indépendante. Votre soutien aide Marc à consacrer du temps à l'écriture."
             }
         ],
         "synopsis": "Dans un monde où la magie est une rareté synonyme de danger, Hilyesin mène une vie de conscrit rythmée par l'entraînement et l'attente. Mais quand il découvre les ruines fumantes de son village natal, anéanti par une force prédatrice, il comprend que sa fiancée Maléna n'a pas péri ; elle a été enlevée. Armé d'un don électrique qu'il ne maîtrise pas et d'une détermination forgée dans les cendres, il se lance sur la piste d'un ennemi dont l'identité reste enveloppée de mystère.",
