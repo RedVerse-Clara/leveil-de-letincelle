@@ -11,7 +11,7 @@ export function renderHero(chaptersData) {
         <h2 class="hero-subtitle electric-text">Tome 1 : Les Cendres</h2>
         <p class="hero-tagline">Un roman de dark fantasy où la magie consume ceux qui l'utilisent.</p>
 
-        <div class="hero-cta-container">
+        <div class="hero-cta-container" style="margin-top: 2rem;">
           <a href="/chapitre/les-cendres-de-pradwyn/" class="btn btn-large btn-glow">
             Lire le premier chapitre →
           </a>
