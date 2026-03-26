@@ -4,7 +4,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://www.leveildeletincelle.fr/</loc>
-    <lastmod>2026-03-21</lastmod>
+    <lastmod>2026-03-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
     <image:image>
@@ -16,7 +16,7 @@
   <!-- Chapters (real URLs) -->
   <url>
     <loc>https://www.leveildeletincelle.fr/chapitre/les-cendres-de-pradwyn/</loc>
-    <lastmod>2026-03-21</lastmod>
+    <lastmod>2026-03-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -26,7 +26,7 @@
   </url>
   <url>
     <loc>https://www.leveildeletincelle.fr/chapitre/lecho-sous-la-pierre/</loc>
-    <lastmod>2026-03-21</lastmod>
+    <lastmod>2026-03-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
     <image:image>
@@ -38,7 +38,7 @@
   <!-- Univers -->
   <url>
     <loc>https://www.leveildeletincelle.fr/univers/</loc>
-    <lastmod>2026-03-21</lastmod>
+    <lastmod>2026-03-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -46,7 +46,7 @@
   <!-- Blog -->
   <url>
     <loc>https://www.leveildeletincelle.fr/blog/</loc>
-    <lastmod>2026-03-21</lastmod>
+    <lastmod>2026-03-26</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
