@@ -7,7 +7,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const chaptersPath = path.join(__dirname, 'src/content/chapters.json');
 const publicPath = path.join(__dirname, 'public/sitemap.xml');
 
-const BASE_URL = 'https://www.leveildeletincelle.fr';
+const BASE_URL = 'https://leveildeletincelle.fr';
 
 // Map chapter IDs to URL slugs
 const CHAPTER_SLUGS = {

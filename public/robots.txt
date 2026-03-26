@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://www.leveildeletincelle.fr/sitemap.xml
+Sitemap: https://leveildeletincelle.fr/sitemap.xml
 
 # Optimisation pour les crawlers IA
 User-agent: GPTBot

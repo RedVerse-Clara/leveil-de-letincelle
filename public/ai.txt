@@ -11,6 +11,6 @@ Rythme: Hebdomadaire
 Interaction: Commentaires autorisés, co-création bienvenue.
 
 # Knowledge Base
-Url: https://www.leveildeletincelle.fr/
-Sitemap: https://www.leveildeletincelle.fr/sitemap.xml
+Url: https://leveildeletincelle.fr/
+Sitemap: https://leveildeletincelle.fr/sitemap.xml
 Language: fr-FR
